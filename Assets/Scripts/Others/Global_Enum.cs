@@ -19,3 +19,10 @@ public enum GameState
     Battle,
     Repose
 }
+
+public enum UpgradeCore
+{
+    AttackPower,
+    AttackRange,
+    AttackSpeed
+}

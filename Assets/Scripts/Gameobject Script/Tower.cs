@@ -26,12 +26,19 @@ public class Tower : NetworkBehaviour
 
     private Enemy m_targetEnemy;
 
-    //replace by enum state for placing
     public bool m_isPlaced = false;
 
     //Storing the tile the building build
     public GameObject[] m_usedTiles;
 
+    //tower attributes
+    private float m_towerAttackPower;
+    private float m_towerAttackSpeed;
+    private float m_towerAttackRange;
+
+    private int m_upgradeRequiredGold;
+
+    //Shooting Countdown
     private float m_nextShootTime = 0;
 
     private void Awake()
@@ -51,11 +58,18 @@ public class Tower : NetworkBehaviour
     private void Init()
     {
         m_towerRangeIndiactor.SetActive(false);
-        m_towerRangeIndiactor.transform.localScale = new Vector3(m_towerSO.m_attackRange, 0.1f, m_towerSO.m_attackRange);
+
+        m_towerAttackPower = m_towerSO.m_attackPower;
+        m_towerAttackSpeed = m_towerSO.m_attackSpeed;
+        m_towerAttackRange = m_towerSO.m_attackRange;
+
+        m_upgradeRequiredGold = m_towerSO.m_cost;
+
+        m_towerRangeIndiactor.transform.localScale = new Vector3(m_towerAttackRange, 0.1f, m_towerAttackRange);
 
         m_usedTiles = new GameObject[m_towerSO.m_tileToBuild.Length + 1];
 
-        m_towerCollider.GetComponent<SphereCollider>().radius = m_towerSO.m_attackRange;
+        m_towerCollider.GetComponent<SphereCollider>().radius = m_towerAttackRange;
 
         m_nextShootTime = Time.time;
     }
@@ -67,9 +81,9 @@ public class Tower : NetworkBehaviour
             return;
         }
 
-        target.HurtEnemy(m_towerSO.m_attackPower);
+        target.HurtEnemy(m_towerAttackPower);
         ShootEffectClientRpc(m_targetEnemy.GetComponent<NetworkObject>().NetworkObjectId);
-        m_nextShootTime = Time.time + m_towerSO.m_attackSpeed;
+        m_nextShootTime = Time.time + m_towerAttackSpeed;
     }
 
     [ClientRpc]
@@ -95,4 +109,11 @@ public class Tower : NetworkBehaviour
     public void ToggleTowerIsPlaced(bool option) => m_isPlaced = option;
     public bool GetIsPlaced() => m_isPlaced;
     public void AssignID(int id) => m_towerID.Value = id;
+
+    public void UpgradeCoreAttackSpeed() => m_towerAttackSpeed = m_towerAttackSpeed - (m_towerAttackSpeed / 10);
+    public void UpgradeCoreAttackPower() => m_towerAttackPower = m_towerAttackPower * 1.15f;
+    public void UpgradeCoreAttackRange() => m_towerAttackRange = m_towerAttackRange * 1.05f;
+
+    public int GetUpgradeRequiredGold() => m_upgradeRequiredGold;
+    public void UpgradeGoldIncrease() => m_upgradeRequiredGold = m_upgradeRequiredGold * 2;
 }

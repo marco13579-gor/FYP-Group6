@@ -13,7 +13,7 @@ public class Enemy : NetworkBehaviour
     private int m_wayPointIndex;
     private int m_enemyID;
 
-    private int m_playerMapID;
+    private NetworkVariable<int> m_playerMapID = new NetworkVariable<int>(0);
 
     private NetworkVariable<FixedString512Bytes> m_name = new NetworkVariable<FixedString512Bytes>("0", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private NetworkVariable<float> m_maxHealth = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -25,7 +25,7 @@ public class Enemy : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        if(!IsServer) { return; }
+        if (!IsServer) { return; }
 
         m_enemyID = EnemyManager.Instance.Register(this.gameObject);
 
@@ -44,7 +44,7 @@ public class Enemy : NetworkBehaviour
         Vector3 movingDir = m_movingTarget.position - transform.position;
         transform.Translate(movingDir.normalized * m_movementSpeed.Value * Time.deltaTime, Space.World);
 
-        if(Vector3.Distance(transform.position, m_movingTarget.position) <= 0.4f) 
+        if (Vector3.Distance(transform.position, m_movingTarget.position) <= 0.4f)
         {
             GetNextWayPoint();
         }
@@ -52,14 +52,10 @@ public class Enemy : NetworkBehaviour
 
     private void GetNextWayPoint()
     {
-
         if (m_wayPointIndex >= m_wayPointList.Length - 1)
         {
-            if (this.GetPlayMap() == GameNetworkManager.Instance.GetPlayerID())
-            {
-                int newHealthAmount = PlayerStatsManager.Instance.GetPlayerHealth(GameNetworkManager.Instance.GetPlayerID()) - (int)this.m_attackPower.Value;
-                GameEventReference.Instance.OnPlayerModifyHealth.Trigger(newHealthAmount, GameNetworkManager.Instance.GetPlayerID());
-            }
+            int newHealthAmount = PlayerStatsManager.Instance.GetPlayerHealth(this.GetPlayMap()) - (int)this.m_attackPower.Value;
+            GameEventReference.Instance.OnPlayerModifyHealth.Trigger(newHealthAmount, this.GetPlayMap());
 
             EnemyManager.Instance.Unregister(this.gameObject);
             return;
@@ -75,7 +71,6 @@ public class Enemy : NetworkBehaviour
         if (m_health.Value <= 0)
         {
             EnemyManager.Instance.Unregister(this.gameObject);
-            print("EnemyManager.Instance.Unregister(this.gameObject)");
         }
     }
 
@@ -89,7 +84,7 @@ public class Enemy : NetworkBehaviour
 
         //Switch player ID to set spawn on which map
         //m_wayPointList = WaypointReference.Instance.m_wayPoints;
-        switch (m_playerMapID)
+        switch (m_playerMapID.Value)
         {
             case 0:
                 m_wayPointList = WaypointReference.Instance.m_wayPoints0;
@@ -107,7 +102,7 @@ public class Enemy : NetworkBehaviour
 
     public int GetEnemyID() => m_enemyID;
 
-    public int SetPlayerMap(int ID) => m_playerMapID = ID;
+    public int SetPlayerMap(int ID) => m_playerMapID.Value = ID;
 
-    public int GetPlayMap() => m_playerMapID;
+    public int GetPlayMap() => m_playerMapID.Value;
 }

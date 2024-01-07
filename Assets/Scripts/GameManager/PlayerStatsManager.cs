@@ -36,6 +36,12 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     {
         int newHealthAmount = (int)param[0];
         int modifierID = (int)param[1];
+        UpdatePlayerHealthModifyServerRpc(newHealthAmount, modifierID);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdatePlayerHealthModifyServerRpc(int newHealthAmount, int modifierID)
+    {
         UpdatePlayerHealthModifyClientRpc(newHealthAmount, modifierID);
     }
 
@@ -49,15 +55,23 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     {
         int newGoldAmount = (int)param[0];
         int modifierID = (int)param[1];
-        UpdatePlayerGoldModifyClientRpc(newGoldAmount, modifierID);
+        UpdatePlayerGoldModifyServerRpc(newGoldAmount, modifierID);
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdatePlayerGoldModifyServerRpc(int newGoldAmount, int modifierID)
+    {
+        print("UpdatePlayerGoldModifyServerRpc");
+        UpdatePlayerGoldModifyClientRpc(newGoldAmount, modifierID);
+    }
     [ClientRpc]
     private void UpdatePlayerGoldModifyClientRpc(int newGoldAmount, int modifierID)
     {
         print($"Modify Target ID: {modifierID}");
         playersGoldList[modifierID] = newGoldAmount;
     }
+
+
 
     public int GetPlayerGold(int id) => playersGoldList[id];
     public int GetPlayerHealth(int id) => playersHealthList[id];

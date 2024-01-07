@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Tiles : Node
 {
     private int m_tilesID;
     public GameObject[] m_tilesNearby = new GameObject[8];
+
+    private bool isRegisterTrigger = false;
 
     public void Awake()
     {
@@ -14,7 +17,17 @@ public class Tiles : Node
 
     private void Start()
     {
-        m_tilesID = TileManager.Instance.Register(this.gameObject);
+        //m_tilesID = TileManager.Instance.Register(this.gameObject);
+    }
+
+    private void Update()
+    {
+        if (!isRegisterTrigger && (IsHost || IsServer) && GameStateManager.Instance.GetReadyStatus())
+        {
+            m_tilesID = TileManager.Instance.Register(this.gameObject);
+            isRegisterTrigger = true;
+        }
+
     }
 
     private void Init()
@@ -28,4 +41,5 @@ public class Tiles : Node
     }
 
     public int GetTilesID() => m_tilesID;
+    public void SetTilesID(int ID) => m_tilesID = ID;
 }

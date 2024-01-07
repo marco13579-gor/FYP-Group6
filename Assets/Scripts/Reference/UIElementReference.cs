@@ -26,4 +26,12 @@ public class UIElementReference : Singleton<UIElementReference>
     public GameObject m_player3StatusText;
     public GameObject m_player4StatusText;
     public GameObject m_playerNumberText;
+
+    public GameObject m_towerUpgradePanel;
+    public GameObject m_towerUpgradeTowerAttackPowerButton;
+    public GameObject m_towerUpgradeTowerAttackPowerText;
+    public GameObject m_towerUpgradeTowerAttackSpeedButton;
+    public GameObject m_towerUpgradeTowerAttackSpeedText;
+    public GameObject m_towerUpgradeTowerAttackRangeButton;
+    public GameObject m_towerUpgradeTowerAttackRangeText;
 }

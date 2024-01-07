@@ -19,6 +19,8 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
     [SerializeField] PrebuildTower m_prebuildTower = null;
     [SerializeField] LayerMask m_layerMask;
 
+    private int m_cardSlotToConsume;
+
     public float m_gridSize;
 
     public void Update()
@@ -52,16 +54,11 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
 
                 if (canBuildTower)
                 {
-                    //BuildTowerServerRPC(raycastHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId, m_towerToBuild.GetTowerID());
-                    //raycastHit.transform.gameObject.GetComponent<Tiles>().m_isPlaced = true;
-                    //GameEventReference.Instance.OnTowerPlaced.Trigger(m_towerToBuild.GetTowerID(), m_towerToBuild.m_towerSO, raycastHit.transform.gameObject, m_towerToBuild);
-                    //m_towerToBuild = null;
                     ToBuildTowerParam param = new ToBuildTowerParam();
                     param.toBuildTower = m_prebuildTower.GetTower();
                     param.tile = raycastHit.transform.gameObject;
 
-                    //FixedString128Bytes paramToString = JsonUtility.ToJson(param, false);
-
+                    GameEventReference.Instance.OnPlayerConsumeCard.Trigger(m_cardSlotToConsume);
                     BuildingRequestServerRpc(m_prebuildTower.GetTower().m_towerSO.m_towerType, raycastHit.transform.GetComponent<Tiles>(), m_prebuildTower.transform.position);
                 }
             }
@@ -190,6 +187,9 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
         pos.z += zDiff > m_gridSize / 2 ? m_gridSize : 0;
         return pos;
     }
+
+    public void SetCardConsumeSlot(int cardSlotIndex) => m_cardSlotToConsume = cardSlotIndex;
+    public PrebuildTower GetPrebuildTower() => m_prebuildTower;
 }
 
 [Serializable]

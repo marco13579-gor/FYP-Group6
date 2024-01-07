@@ -12,7 +12,7 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
 
     private float m_enterStateTime;
 
-    private const float m_prepartionTime = 6f;
+    private const float m_prepartionTime = 10f;
     private const float m_reposeTime = 4f;
 
     private bool m_enterBattleStateTrigger = true;
@@ -105,6 +105,7 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
     public float GetReposeTime() => m_reposeTime;
 
     public void ToggleReadyButtonClick() => m_isReadyButtonClicked = true;
+    public bool GetReadyStatus() => m_isReadyButtonClicked;
 
     public int GetGameTurn() => m_turn;
 }

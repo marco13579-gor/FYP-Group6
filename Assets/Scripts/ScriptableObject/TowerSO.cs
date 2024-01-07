@@ -9,11 +9,14 @@ public class TowerSO : ScriptableObject
     [Header("Tower Setting")]
     public string m_name = "default Tower";
     public TowerType m_towerType;
-    public int m_attackPower;
-    public int m_attackSpeed;
+    public float m_attackPower;
+    public float m_attackSpeed;
     public float m_attackRange;
     public int m_cost;
     public Projectile m_attackObject;
     public int[] m_tileToBuild;
     public Vector3 m_offset;
+
+    public Sprite m_sprite;
+    public string m_desritption;
 }

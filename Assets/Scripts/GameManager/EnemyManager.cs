@@ -60,7 +60,6 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
     [ClientRpc]
     private void SetUpEnemyRemainListClientRpc(int[] enemyCount)
     {
-        print(GameNetworkManager.Instance.GetPlayerNumber());
         for (int i = 0; i < enemyCount.Length; i++)
         {
             m_waveEnemyRemainingList[i] = enemyCount[i];

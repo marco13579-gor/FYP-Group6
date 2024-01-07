@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TileManager : Singleton<TileManager>
+public class TileManager : NetworkedSingleton<TileManager>
 {
     private Dictionary<int, GameObject> m_tiles = new Dictionary<int, GameObject>();
 
@@ -25,12 +25,20 @@ public class TileManager : Singleton<TileManager>
         GameObject originTile = (GameObject)param[2];
 
         int tileID = originTile.GetComponent<Tiles>().GetTilesID();
+        int[] m_tileToBuild = towerSO.m_tileToBuild;
 
+        AddTilesPlacedClientRpc(m_tileToBuild, tileID);
+    }
+
+    [ClientRpc]
+    private void AddTilesPlacedClientRpc(int[] m_tileToBuild, int tileID)
+    {
+        print("AddTilesPlacedClientRpc");
         m_tiles[tileID].GetComponent<Tiles>().m_isPlaced = true;
 
-        for (int i = 0; i < towerSO.m_tileToBuild.Length; i++)
+        for (int i = 0; i < m_tileToBuild.Length; i++)
         {
-            GameObject currentNearbyTile = m_tiles[tileID].GetComponent<Tiles>().m_tilesNearby[towerSO.m_tileToBuild[i]].gameObject;
+            GameObject currentNearbyTile = m_tiles[tileID].GetComponent<Tiles>().m_tilesNearby[m_tileToBuild[i]].gameObject;
             currentNearbyTile.GetComponent<Tiles>().m_isPlaced = true;
         }
     }
@@ -52,8 +60,8 @@ public class TileManager : Singleton<TileManager>
                 randomIndex = Random.Range(0, 16777216);
             }
 
-            //Add to list
-            m_tiles.Add(randomIndex, gameObj);
+            TileRigisterClientRpc(randomIndex, gameObj.GetComponent<Tiles>());
+            //m_tiles.Add(randomIndex, gameObj);
 
             return randomIndex;
         }
@@ -63,6 +71,19 @@ public class TileManager : Singleton<TileManager>
             return -1;
         }
     }
+
+    [ClientRpc]
+    private void TileRigisterClientRpc(int tileID, NetworkBehaviourReference tileParam)
+    {
+        Tiles tile;
+        tileParam.TryGet(out tile);
+
+        GameObject tileGameObject = tile.gameObject;
+
+        m_tiles.Add(tileID, tileGameObject);
+        tile.SetTilesID(tileID);
+    }
+
 
     public void Unregister(GameObject gameObj)
     {

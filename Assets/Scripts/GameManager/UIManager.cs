@@ -92,7 +92,22 @@ public class UIManager : NetworkBehaviour
     {
         int newHealthAmount = (int)param[0];
         int modifierID = (int)param[1];
-        UIElementReference.Instance.m_healthText.GetComponent<TMP_Text>().text = newHealthAmount.ToString();
+        ModifyHealthUIServerRpc(newHealthAmount, modifierID);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ModifyHealthUIServerRpc(int healthAmount, int modifierID)
+    {
+        ModifyHealthUIClientRpc(healthAmount, modifierID);
+    }
+
+    [ClientRpc]
+    private void ModifyHealthUIClientRpc(int healthAmount, int modifierID)
+    {
+        if(modifierID == (int)NetworkManager.Singleton.LocalClientId)
+        {
+            UIElementReference.Instance.m_healthText.GetComponent<TMP_Text>().text = healthAmount.ToString();
+        }
     }
 
     [ClientRpc]
@@ -106,7 +121,22 @@ public class UIManager : NetworkBehaviour
     {
         int newGoldAmount = (int)param[0];
         int modifierID = (int)param[1];
-        UIElementReference.Instance.m_goldText.GetComponent<TMP_Text>().text = newGoldAmount.ToString();
+        ModifyGoldUIServerRpc(newGoldAmount, modifierID);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ModifyGoldUIServerRpc(int goldAmount, int modifierID)
+    {
+        ModifyGoldUIClientRpc(goldAmount, modifierID);
+    }
+
+    [ClientRpc]
+    private void ModifyGoldUIClientRpc(int goldAmount, int modifierID)
+    {
+        if (modifierID == (int)NetworkManager.Singleton.LocalClientId)
+        {
+            UIElementReference.Instance.m_goldText.GetComponent<TMP_Text>().text = goldAmount.ToString();
+        }
     }
 
     [ClientRpc]

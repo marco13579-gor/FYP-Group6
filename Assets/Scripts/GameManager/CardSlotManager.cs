@@ -4,35 +4,89 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using TMPro;
+using Unity.Netcode;
 
-public class CardSlotManager : Singleton<CardSlotManager>
+public class CardSlotManager : NetworkedSingleton<CardSlotManager>
 {
     [SerializeField]
-    private GameObject m_cardButton1;
-    [SerializeField]
-    private GameObject m_cardButton2;
-    [SerializeField]
-    private GameObject m_cardButton3;
-    [SerializeField]
-    private GameObject m_cardButton4;
-    [SerializeField]
-    private GameObject m_cardButton5;
+    private GameObject[] m_cardSlots;
 
     private int m_randomIndex;
-    public void RefreshCardSlot(GameObject cardSlot)
+
+    private void Start()
     {
-        int randomCardIndex = GetRandomCardIndex(GameStateManager.Instance.GetGameTurn());
+        SetUpListeners();
+    }
 
-        int towerCost = CardDatabaseReference.Instance.m_cardDatabaseList[randomCardIndex].GetComponent<PrebuildTower>().m_towerSO.m_cost;
+    private void SetUpListeners()
+    {
+        GameEventReference.Instance.OnEnterPreparationState.AddListener(OnEnterPreparationState);
+        GameEventReference.Instance.OnPlayerConsumeCard.AddListener(OnPlayerConsumeCard);
+    }
 
-        cardSlot.GetComponent<Button>().onClick.AddListener(delegate
+    private void RefreshCardSlot(int slotIndex)
+    {
+        m_cardSlots[slotIndex].SetActive(true);
+        m_cardSlots[slotIndex].transform.GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
+
+        int randomIndex = GetRandomCardIndex(GameStateManager.Instance.GetGameTurn());
+
+        m_cardSlots[slotIndex].transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate 
         {
-            BuildingManager.Instance.SelectTower(CardDatabaseReference.Instance.m_cardDatabaseList[randomCardIndex].GetComponent<PrebuildTower>());
+            if(BuildingManager.Instance.GetPrebuildTower() == null)
+            {
+                BuildingManager.Instance.SelectTower(CardDatabaseReference.Instance.m_cardDatabaseList[randomIndex].GetComponent<PrebuildTower>());
+                BuildingManager.Instance.SetCardConsumeSlot(slotIndex);
+            }
         });
+
+        UpdataCardSlotVisual(slotIndex, CardDatabaseReference.Instance.m_cardDatabaseList[randomIndex].GetComponent<PrebuildTower>());
+    }
+
+    private void OnPlayerConsumeCard(params object[] param)
+    {
+        int cardIndex = (int)param[0];
+        RemoveCardSlotContent(cardIndex);
+    }
+
+    private void OnEnterPreparationState(params object[] param)
+    {
+        RefreshCardSlotClientRpc();
+    }
+
+    [ClientRpc]
+    private void RefreshCardSlotClientRpc()
+    {
+        for (int i = 0; i < m_cardSlots.Length; i++)
+        {
+            RefreshCardSlot(i);
+        }
+    }
+
+    private void UpdataCardSlotVisual(int slotIndex, PrebuildTower towerToBuild)
+    {
+        m_cardSlots[slotIndex].transform.GetChild(0).GetComponent<Image>().sprite = towerToBuild.m_towerSO.m_sprite;
+        m_cardSlots[slotIndex].transform.GetChild(2).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_name;
+        m_cardSlots[slotIndex].transform.GetChild(3).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_desritption;
+        m_cardSlots[slotIndex].transform.GetChild(5).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_cost.ToString();
+        m_cardSlots[slotIndex].transform.GetChild(6).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_attackPower.ToString();
+        m_cardSlots[slotIndex].transform.GetChild(7).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_attackRange.ToString();
+    }
+
+    private void RemoveCardSlotContent(int cardSlotToRemove)
+    {
+        m_cardSlots[cardSlotToRemove].transform.GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
+        m_cardSlots[cardSlotToRemove].SetActive(false);
     }
 
     private int GetRandomCardIndex(int turnValue)
     {
+        if(turnValue == 0)
+        {
+            turnValue = 1;
+        }
+
         do {
             m_randomIndex = UnityEngine.Random.Range(0, CardDatabaseReference.Instance.m_cardDatabaseList.Length);
 
