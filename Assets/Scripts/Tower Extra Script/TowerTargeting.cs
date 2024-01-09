@@ -29,6 +29,9 @@ public class TowerTargeting : NetworkBehaviour
             return;
         }
 
+        if (!IsServer)
+            return;
+
         if (m_availableTargets.Count == 0)
         {
             m_targetEnemy = null;

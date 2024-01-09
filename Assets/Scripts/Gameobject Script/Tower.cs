@@ -51,7 +51,7 @@ public class Tower : NetworkBehaviour
         if (!m_isPlaced)
             return;
 
-        if (m_targetEnemy != null)
+        if (IsServer && m_targetEnemy != null)
             Shoot(m_targetEnemy);
     }
 

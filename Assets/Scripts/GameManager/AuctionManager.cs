@@ -98,7 +98,7 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
 
         if (m_highestBid.Value + m_minimumBidAmount > m_bidAmount)
         {
-            print("bid amount must be highest + 10");
+            print($"bid amount must be highest + {m_minimumBidAmount}");
             return;
         }
 

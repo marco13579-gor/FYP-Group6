@@ -147,10 +147,12 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
             m_SpawnedEnemies.Remove(enemy.GetEnemyID());
         }
 
-        GameEventReference.Instance.OnEnemyDestroyed.Trigger(enemy.gameObject, enemy.GetComponent<Enemy>().GetPlayMap());
         print($"enemy.GetComponent<Enemy>().GetPlayMap(): {enemy.GetComponent<Enemy>().GetPlayMap()}");
-        Destroy(enemy);
-        enemy.GetComponent<NetworkObject>().Despawn();
+        if (enemy.TryGetComponent<NetworkObject>(out var networkObject) && networkObject.IsSpawned)
+        {
+            GameEventReference.Instance.OnEnemyDestroyed.Trigger(enemy.gameObject, enemy.GetComponent<Enemy>().GetPlayMap());
+            networkObject.Despawn();
+        }
     }
 
     public void OnEnemyDestroyed(params object[] param)

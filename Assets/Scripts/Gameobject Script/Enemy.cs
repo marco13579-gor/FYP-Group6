@@ -8,6 +8,7 @@ using UnityEngine;
 public class Enemy : NetworkBehaviour
 {
     [SerializeField] private EnemySO m_enemySO;
+    [SerializeField] private Collider m_Collider;
     private Transform[] m_wayPointList;
     private Transform m_movingTarget;
     private int m_wayPointIndex;
@@ -20,6 +21,11 @@ public class Enemy : NetworkBehaviour
     private NetworkVariable<float> m_health = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private NetworkVariable<float> m_attackPower = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private NetworkVariable<float> m_movementSpeed = new NetworkVariable<float>(0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    private void Awake()
+    {
+        m_Collider.enabled = false;
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -98,6 +104,7 @@ public class Enemy : NetworkBehaviour
 
         //position init
         this.transform.position = m_wayPointList[0].transform.position;
+        m_Collider.enabled = true;
     }
 
     public int GetEnemyID() => m_enemyID;
