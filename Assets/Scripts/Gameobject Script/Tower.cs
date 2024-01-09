@@ -65,7 +65,7 @@ public class Tower : NetworkBehaviour
 
         m_upgradeRequiredGold = m_towerSO.m_cost;
 
-        m_towerRangeIndiactor.transform.localScale = new Vector3(m_towerAttackRange, 0.1f, m_towerAttackRange);
+        m_towerRangeIndiactor.transform.localScale = new Vector3(m_towerAttackRange, 1f, m_towerAttackRange);
 
         m_usedTiles = new GameObject[m_towerSO.m_tileToBuild.Length + 1];
 
@@ -112,8 +112,15 @@ public class Tower : NetworkBehaviour
 
     public void UpgradeCoreAttackSpeed() => m_towerAttackSpeed = m_towerAttackSpeed - (m_towerAttackSpeed / 10);
     public void UpgradeCoreAttackPower() => m_towerAttackPower = m_towerAttackPower * 1.15f;
-    public void UpgradeCoreAttackRange() => m_towerAttackRange = m_towerAttackRange * 1.05f;
+    public void UpgradeCoreAttackRange() 
+    {
+        m_towerAttackRange = m_towerAttackRange * 1.05f;
+        m_towerRangeIndiactor.transform.localScale = new Vector3(m_towerAttackRange, 1f, m_towerAttackRange);
+    }
 
     public int GetUpgradeRequiredGold() => m_upgradeRequiredGold;
     public void UpgradeGoldIncrease() => m_upgradeRequiredGold = m_upgradeRequiredGold * 2;
+
+    public void TurnOnRangeIndiactor() => m_towerRangeIndiactor.SetActive(true);
+    public void TurnOffRangeIndiactor() => m_towerRangeIndiactor.SetActive(false);
 }

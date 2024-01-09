@@ -18,5 +18,7 @@ public class GameEventReference : Singleton<GameEventReference>
     public GameEvent OnEnterBattleState = new GameEvent();
     public GameEvent OnEnterReposeState = new GameEvent();
 
+    public GameEvent OnEnterAuctionState = new GameEvent();
+
     public GameEvent OnPlayerConsumeCard = new GameEvent();
 }

@@ -47,9 +47,16 @@ public class UIManager : NetworkBehaviour
         {
             if (Time.time >= m_reposeTimer)
             {
-                //Enter Paparation State
+                //Enter Next Paparation State
                 m_reposeTimerCountDownTriggered = true;
-                UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "EnteredParationState";
+                if(GameStateManager.Instance.GetGameTurn() % GameStateManager.Instance.GetAuctionStateTriggerCount() == 0)
+                {
+                    UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "EnteredAuctionEvent!!!";
+                }
+                else
+                {
+                    UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "EnteredParationState";
+                }
             }
             else
             {
@@ -70,6 +77,7 @@ public class UIManager : NetworkBehaviour
         GameEventReference.Instance.OnEnterBattleState.AddListener(OnEnterBattleState);
         GameEventReference.Instance.OnEnterReposeState.AddListener(OnEnterReposeState);
         GameEventReference.Instance.OnEnemyDestroyed.AddListener(OnEnemyDestroyed);
+        GameEventReference.Instance.OnEnterAuctionState.AddListener(OnEnterAuctionState);
     }
 
     private void OnEnterPreparationState(params object[] param)
@@ -87,6 +95,17 @@ public class UIManager : NetworkBehaviour
     {
         m_stateText.Value = "State: Repose";
     }
+
+    private void OnEnterAuctionState(params object[] param)
+    {
+        OnEnterAuctionStateClientRpc();
+    }
+    [ClientRpc]
+    private void OnEnterAuctionStateClientRpc()
+    {
+        UIElementReference.Instance.m_auctionPanel.SetActive(true);
+    }
+
 
     private void OnPlayerModifyHealth(params object[] param)
     {
@@ -164,8 +183,6 @@ public class UIManager : NetworkBehaviour
     {
         UIElementReference.Instance.m_mobsremainingText.GetComponent<TMP_Text>().text = EnemyManager.Instance.GetEnenyRemaining((int)NetworkManager.Singleton.LocalClientId).ToString();
     }
-
-
 
     private void UpdateStateText(FixedString4096Bytes previous, FixedString4096Bytes current)
     {

@@ -12,6 +12,13 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
     [SerializeField]
     private Camera m_camera;
+    [SerializeField]
+    private Material m_outlineMaterial;
+    [SerializeField]
+    private Shader m_outlineShader;
+
+    private GameObject m_selectedTower;
+    private GameObject m_previousSelectedTower;
 
     private void Start()
     {
@@ -55,9 +62,41 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
         if (Physics.Raycast(ray, out RaycastHit hit, 100000f, LayerMask.GetMask("Tower")) && Input.GetKeyDown(KeyCode.Mouse0) && BuildingManager.Instance.GetPrebuildTower() == null)
         {
+            //Turn off last selected tower RangeIndiactor
+            if (m_selectedTower != null)
+                m_selectedTower.GetComponent<Tower>().TurnOffRangeIndiactor();
+
             UIElementReference.Instance.m_towerUpgradePanel.SetActive(true);
 
-            GameObject target = hit.collider.gameObject;
+            GameObject currentTarget = null;
+            GameObject target = m_selectedTower;
+            float minDistance = 100;
+
+            Collider[] targets = Physics.OverlapSphere(hit.point, 5f, LayerMask.GetMask("Tower"));
+            for (int i = 0; i < targets.Length; i++)
+            {
+                GameObject go = targets[i].gameObject;
+                if (Vector3.Distance(go.transform.position, hit.point) < minDistance)
+                {
+                    currentTarget = go;
+                    minDistance = Vector3.Distance(go.transform.position, hit.point);
+                }
+            }
+
+            Material mat = new Material(m_outlineMaterial);
+            mat.SetColor("_Color", Color.blue);
+            mat.SetFloat("_Scale", 1.05f);
+            if (target != null)
+            {
+                m_previousSelectedTower = m_selectedTower;
+                m_previousSelectedTower.GetComponent<MeshRenderer>().materials[1] = null;
+            }
+            target = currentTarget;
+            m_selectedTower = currentTarget;
+            target.GetComponent<MeshRenderer>().materials[1] = null;
+
+
+            target.GetComponent<Tower>().TurnOnRangeIndiactor();
 
             UpdateUpgradeGoldText(target.GetComponent<Tower>().GetUpgradeRequiredGold());
 
@@ -109,7 +148,12 @@ public class TowerManager : NetworkedSingleton<TowerManager>
             UIElementReference.Instance.m_towerUpgradeTowerAttackSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
             UIElementReference.Instance.m_towerUpgradeTowerAttackRangeButton.GetComponent<Button>().onClick.RemoveAllListeners();
 
+            m_selectedTower.GetComponent<Tower>().TurnOffRangeIndiactor();
+
             UIElementReference.Instance.m_towerUpgradePanel.SetActive(false);
+
+            if (m_selectedTower != null)
+                m_selectedTower.GetComponent<MeshRenderer>().materials[1] = null;
         }
     }
 

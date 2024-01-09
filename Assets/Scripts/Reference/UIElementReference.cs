@@ -34,4 +34,16 @@ public class UIElementReference : Singleton<UIElementReference>
     public GameObject m_towerUpgradeTowerAttackSpeedText;
     public GameObject m_towerUpgradeTowerAttackRangeButton;
     public GameObject m_towerUpgradeTowerAttackRangeText;
+
+    public GameObject m_auctionPanel;
+    public GameObject m_auctionCardSlot;
+    public GameObject m_bidButton;
+    public GameObject m_giveupButton;
+    public GameObject m_currentBidderText;
+    public GameObject m_bidAmountText;
+    public GameObject m_bidAmountInputField;
+    public GameObject m_player1GoldText;
+    public GameObject m_player2GoldText;
+    public GameObject m_player3GoldText;
+    public GameObject m_player4GoldText;
 }
