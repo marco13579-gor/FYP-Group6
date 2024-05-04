@@ -12,17 +12,17 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
 
     private float m_enterStateTime;
 
-    private const float m_prepartionTime = 5f;
+    private const float m_prepartionTime = 10f;
     private const float m_reposeTime = 4f;
 
     private bool m_enterBattleStateTrigger = true;
     private bool m_enterPaparationStateTrigger = true;
 
-    private bool m_isReadyButtonClicked = false;
+    private NetworkVariable<bool> m_isReadyButtonClicked = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     private NetworkVariable<int> m_turn = new NetworkVariable<int>(0);
 
-    private const int m_auctionStateTriggerCount = 2;
+    private const int m_auctionStateTriggerCount = 5;
     private void Start()
     {
         SetUpListeners();
@@ -30,18 +30,42 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
 
     private void Update()
     {
-        if (NetworkManager.Singleton.IsServer && !m_firstTurnTriggered && m_isReadyButtonClicked)
+        if (!m_firstTurnTriggered && m_isReadyButtonClicked.Value)
         {
-            GameEventReference.Instance.OnEnterPreparationState.Trigger();
-            m_firstTurnTriggered = true;
+            if (IsClient)
+            {
+                print($"player ID = {GameNetworkManager.Instance.GetPlayerID()}");
+                switch (GameNetworkManager.Instance.GetPlayerID())
+                {
+                    case 0:
+                        GameObjectReference.Instance.cameraFocusPoint.transform.position = GameObjectReference.Instance.m_spawnPoint0.transform.position;
+                        break;
+                    case 1:
+                        GameObjectReference.Instance.cameraFocusPoint.transform.position = GameObjectReference.Instance.m_spawnPoint1.transform.position;
+                        break;
+                    case 2:
+                        GameObjectReference.Instance.cameraFocusPoint.transform.position = GameObjectReference.Instance.m_spawnPoint2.transform.position;
+                        break;
+                    case 3:
+                        GameObjectReference.Instance.cameraFocusPoint.transform.position = GameObjectReference.Instance.m_spawnPoint3.transform.position;
+                        break;
+                }
+                m_firstTurnTriggered = true;
+            }
+
+            if (NetworkManager.Singleton.IsServer)
+            {
+                GameEventReference.Instance.OnEnterPreparationState.Trigger();
+                m_firstTurnTriggered = true;
+            }
         }
 
         //CountDown for entering battle state
-        if(NetworkManager.Singleton.IsServer && !m_enterBattleStateTrigger)
+        if (NetworkManager.Singleton.IsServer && !m_enterBattleStateTrigger)
         {
             if (Time.time >= m_enterStateTime)
             {
-                if(WaveDatabaseReference.Instance.m_waveList[m_turn.Value] != null)
+                if (WaveDatabaseReference.Instance.m_waveList[m_turn.Value] != null)
                 {
                     GameEventReference.Instance.OnEnterBattleState.Trigger(WaveDatabaseReference.Instance.m_waveList[m_turn.Value]);
                     ++m_turn.Value;
@@ -55,12 +79,22 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
         }
 
         //CountDown for entering paparation state
-        if(NetworkManager.Singleton.IsServer && !m_enterPaparationStateTrigger)
+        if (NetworkManager.Singleton.IsServer && !m_enterPaparationStateTrigger)
         {
             if (Time.time >= m_enterStateTime)
             {
-                GameEventReference.Instance.OnEnterPreparationState.Trigger();
-                m_enterPaparationStateTrigger = true;
+                if (GetGameTurn() % m_auctionStateTriggerCount == 0)
+                {
+                    //Enter Auction State
+                    GameEventReference.Instance.OnEnterAuctionState.Trigger();
+                    m_enterPaparationStateTrigger = true;
+                }
+                else
+                {
+                    //Enter Preparation State
+                    GameEventReference.Instance.OnEnterPreparationState.Trigger();
+                    m_enterPaparationStateTrigger = true;
+                }
             }
         }
     }
@@ -85,27 +119,19 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
     {
         print("OnEnterBattleState");
     }
-    
+
     private void OnEnterReposeState(params object[] param)
     {
         //give player gold
-        for(int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
+        for (int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
         {
             int newgold = PlayerStatsManager.Instance.GetPlayerGold(i) + 10;
             GameEventReference.Instance.OnPlayerModifyGold.Trigger(newgold, i);
         }
 
-        if (GetGameTurn() % m_auctionStateTriggerCount == 0)
-        {
-            //Enter Auction State
-            GameEventReference.Instance.OnEnterAuctionState.Trigger();
-        }
-        else
-        {
-            //Enter Preparation State
-            m_enterStateTime = m_reposeTime + Time.time;
-            m_enterPaparationStateTrigger = false;
-        }
+        //Enter Preparation State
+        m_enterStateTime = m_reposeTime + Time.time;
+        m_enterPaparationStateTrigger = false;
     }
 
     public GameState GetGameState() => m_gameState.Value;
@@ -114,8 +140,8 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
 
     public float GetReposeTime() => m_reposeTime;
 
-    public void ToggleReadyButtonClick() => m_isReadyButtonClicked = true;
-    public bool GetReadyStatus() => m_isReadyButtonClicked;
+    public void ToggleReadyButtonClick() => m_isReadyButtonClicked.Value = true;
+    public bool GetReadyStatus() => m_isReadyButtonClicked.Value;
 
     public int GetGameTurn() => m_turn.Value;
     public int GetAuctionStateTriggerCount() => m_auctionStateTriggerCount;

@@ -8,8 +8,9 @@ public class EnemySO : ScriptableObject
 {
     [Header("Enemy Setting")]
     public string m_name = "default Enemy";
-    public int m_maxHealth = 10;
-    public int m_health;
+    public float m_maxHealth = 10;
+    public float m_health;
     public int m_attackPower = 5;
-    public int m_movementSpeed = 5;
+    public float m_movementSpeed = 5;
+    public int m_rewardGold = 1;
 }

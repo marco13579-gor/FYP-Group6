@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
@@ -36,6 +37,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
     {
         GameEventReference.Instance.OnTowerPlaced.AddListener(OnTowerPlaced);
         GameEventReference.Instance.OnTowerChangeTarget.AddListener(OnTowerChangeTarget);
+        GameEventReference.Instance.OnTowerRemoved.AddListener(OnTowerRemoved);
     }
 
     private void OnTowerPlaced(params object[] param)
@@ -44,15 +46,38 @@ public class TowerManager : NetworkedSingleton<TowerManager>
         TowerSO towerSO = (TowerSO)param[1];
         GameObject originTile = (GameObject)param[2];
 
-        m_towers[towerID].GetComponent<Tower>().ToggleTowerIsPlaced(true);
-        m_towers[towerID].GetComponent<Tower>().SetUsedTiles(0, originTile);
-
-        for (int i = 0; i < towerSO.m_tileToBuild.Length; i++)
-        {
-            m_towers[towerID].GetComponent<Tower>().SetUsedTiles(i + 1, originTile.GetComponent<Tiles>().m_tilesNearby[towerSO.m_tileToBuild[i]].gameObject);
-        }
+        SetTowerTileListServerRpc(towerSO.m_tileToBuild, towerID, originTile.GetComponent<Tiles>());
 
         m_towers[towerID].GetComponent<TowerTargeting>().SetTower(m_towers[towerID].GetComponent<Tower>());
+    }
+
+    private void OnTowerRemoved(params object[] param)
+    {
+        GameObject[] usedTiles = (GameObject[])param[1];
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetTowerTileListServerRpc(int[] m_tileToBuild, int towerID, NetworkBehaviourReference tilesParam)
+    {
+        Tiles originTile;
+        tilesParam.TryGet(out originTile);
+
+        SetTowerTileListClientRpc(m_tileToBuild, towerID, originTile.GetComponent<Tiles>());
+    }
+
+    [ClientRpc]
+    private void SetTowerTileListClientRpc(int[] m_tileToBuild, int towerID, NetworkBehaviourReference tilesParam)
+    {
+        Tiles originTile;
+        tilesParam.TryGet(out originTile);
+
+        m_towers[towerID].GetComponent<Tower>().ToggleTowerIsPlaced(true);
+        m_towers[towerID].GetComponent<Tower>().SetUsedTiles(0, originTile.gameObject);
+
+        for (int i = 0; i < m_tileToBuild.Length; i++)
+        {
+            m_towers[towerID].GetComponent<Tower>().SetUsedTiles(i + 1, originTile.m_tilesNearby[m_tileToBuild[i]].gameObject);
+        }
     }
 
 
@@ -60,8 +85,13 @@ public class TowerManager : NetworkedSingleton<TowerManager>
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 100000f, LayerMask.GetMask("Tower")) && Input.GetKeyDown(KeyCode.Mouse0) && BuildingManager.Instance.GetPrebuildTower() == null)
+        if (Physics.Raycast(ray, out RaycastHit hit, 100000f, LayerMask.GetMask("Tower")) && Input.GetKeyDown(KeyCode.Mouse0) && BuildingManager.Instance.GetPrebuildTower() == null && m_selectedTower == null)
         {
+            if (hit.transform.gameObject.GetComponent<Tower>().m_usedTiles[0].GetComponent<Tiles>().GetPossibleBuilderID() != GameNetworkManager.Instance.GetPlayerID())
+            {
+                return;
+            }
+
             //Turn off last selected tower RangeIndiactor
             if (m_selectedTower != null)
                 m_selectedTower.GetComponent<Tower>().TurnOffRangeIndiactor();
@@ -89,23 +119,36 @@ public class TowerManager : NetworkedSingleton<TowerManager>
             if (target != null)
             {
                 m_previousSelectedTower = m_selectedTower;
-                m_previousSelectedTower.GetComponent<MeshRenderer>().materials[1] = null;
             }
             target = currentTarget;
             m_selectedTower = currentTarget;
-            target.GetComponent<MeshRenderer>().materials[1] = null;
 
 
             target.GetComponent<Tower>().TurnOnRangeIndiactor();
 
             UpdateUpgradeGoldText(target.GetComponent<Tower>().GetUpgradeRequiredGold());
+            UIElementReference.Instance.m_towerImage.GetComponent<Image>().sprite = target.GetComponent<Tower>().m_towerSO.m_sprite;
+            UIElementReference.Instance.m_attackPowerText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackPower().ToString();
+            UIElementReference.Instance.m_attackRangeText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackRange().ToString();
+            UIElementReference.Instance.m_attacSpeedText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackSpeed().ToString();
+            UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+            UIElementReference.Instance.m_desriptionText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().m_towerSO.m_desritption.ToString();
 
             UIElementReference.Instance.m_towerUpgradeTowerAttackPowerButton.GetComponent<Button>().onClick.AddListener(delegate
             {
-                if (PlayerStatsManager.Instance.playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
+                if (PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
+                {
+                    GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
                     return;
+                }
+
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_upgradeSound);
 
                 UpgradeTower(target.GetComponent<Tower>().GetTowerID(), UpgradeCore.AttackPower);
+
+                target.GetComponent<Tower>().EnableUpgradeEffect();
+
+                UIElementReference.Instance.m_attackPowerText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackPower().ToString();
 
                 GameEventReference.Instance.OnPlayerModifyGold.Trigger(PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - target.GetComponent<Tower>().GetUpgradeRequiredGold(), GameNetworkManager.Instance.GetPlayerID());
 
@@ -116,10 +159,15 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
             UIElementReference.Instance.m_towerUpgradeTowerAttackSpeedButton.GetComponent<Button>().onClick.AddListener(delegate
             {
-                if (PlayerStatsManager.Instance.playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
+                if (PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
+                {
+                    GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
                     return;
+                }
 
                 UpgradeTower(target.GetComponent<Tower>().GetTowerID(), UpgradeCore.AttackSpeed);
+
+                UIElementReference.Instance.m_attacSpeedText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackSpeed().ToString();
 
                 GameEventReference.Instance.OnPlayerModifyGold.Trigger(PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - target.GetComponent<Tower>().GetUpgradeRequiredGold(), GameNetworkManager.Instance.GetPlayerID());
 
@@ -130,10 +178,15 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
             UIElementReference.Instance.m_towerUpgradeTowerAttackRangeButton.GetComponent<Button>().onClick.AddListener(delegate
             {
-                if (PlayerStatsManager.Instance.playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
+                if (PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
+                {
+                    GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
                     return;
+                }
 
                 UpgradeTower(target.GetComponent<Tower>().GetTowerID(), UpgradeCore.AttackRange);
+
+                UIElementReference.Instance.m_attackRangeText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackRange().ToString();
 
                 GameEventReference.Instance.OnPlayerModifyGold.Trigger(PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - target.GetComponent<Tower>().GetUpgradeRequiredGold(), GameNetworkManager.Instance.GetPlayerID());
 
@@ -141,19 +194,85 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
                 UpdateUpgradeGoldText(target.GetComponent<Tower>().GetUpgradeRequiredGold());
             });
+
+            UIElementReference.Instance.m_towerTargetConditionFirstTargetButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.FirstTarget);
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
+                UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+            });
+
+            UIElementReference.Instance.m_towerTargetConditionLastTargetButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.LastTarget);
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
+                UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+            });
+
+            UIElementReference.Instance.m_towerTargetConditionMaxHealthButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MaxHealth);
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
+                UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+            });
+
+            UIElementReference.Instance.m_towerTargetConditionMinHealthButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MinHealth);
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
+                UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+            });
+
+            UIElementReference.Instance.m_towerTargetConditionMaxSpeedButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MaxSpeed);
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
+                UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+            });
+
+            UIElementReference.Instance.m_towerTargetConditionMinSpeedButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MinSpeed);
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
+                UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+            });
+
+            UIElementReference.Instance.m_removeTowerButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                GameEventReference.Instance.OnTowerRemoved.Trigger(m_selectedTower.GetComponent<Tower>().GetTowerID(), m_selectedTower.GetComponent<Tower>().m_usedTiles);
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_removeBuildingSound);
+                UIElementReference.Instance.m_towerUpgradeTowerAttackPowerButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerUpgradeTowerAttackSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerUpgradeTowerAttackRangeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerTargetConditionFirstTargetButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerTargetConditionLastTargetButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerTargetConditionMaxHealthButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerTargetConditionMinHealthButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerTargetConditionMaxSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIElementReference.Instance.m_towerTargetConditionMinSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
+
+                UIElementReference.Instance.m_towerUpgradePanel.SetActive(false);
+            });
         }
         else if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             UIElementReference.Instance.m_towerUpgradeTowerAttackPowerButton.GetComponent<Button>().onClick.RemoveAllListeners();
             UIElementReference.Instance.m_towerUpgradeTowerAttackSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
             UIElementReference.Instance.m_towerUpgradeTowerAttackRangeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-
-            m_selectedTower.GetComponent<Tower>().TurnOffRangeIndiactor();
-
-            UIElementReference.Instance.m_towerUpgradePanel.SetActive(false);
+            UIElementReference.Instance.m_towerTargetConditionFirstTargetButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIElementReference.Instance.m_towerTargetConditionLastTargetButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIElementReference.Instance.m_towerTargetConditionMaxHealthButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIElementReference.Instance.m_towerTargetConditionMinHealthButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIElementReference.Instance.m_towerTargetConditionMaxSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIElementReference.Instance.m_towerTargetConditionMinSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIElementReference.Instance.m_removeTowerButton.GetComponent<Button>().onClick.RemoveAllListeners();
 
             if (m_selectedTower != null)
-                m_selectedTower.GetComponent<MeshRenderer>().materials[1] = null;
+                m_selectedTower.GetComponent<Tower>().TurnOffRangeIndiactor();
+
+            m_selectedTower = null;
+
+            UIElementReference.Instance.m_towerUpgradePanel.SetActive(false);
         }
     }
 

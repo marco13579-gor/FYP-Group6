@@ -1,41 +1,66 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
-public class Projectile : MonoBehaviour
+public abstract class Projectile : NetworkBehaviour
 {
-    public float m_speed;
+    [SerializeField]
+    protected float m_speed = 0.25f;
+    protected Enemy m_enemyToShoot;
+    protected float m_attackPower;
 
-    private bool m_Active;
+    protected int m_shootTowerID;
+    protected Vector3 m_enemyPosition;
 
-    public void SetDestination(Transform destination)
+    protected bool isTargetEnemyDie = false;
+    protected virtual void Start()
     {
-        if (m_Active)
-            return;
-
-        StartCoroutine(Animation(destination));
-        m_Active = true;
-    }
-
-    private IEnumerator Animation(Transform destination)
-    {
-        float distance = Vector3.Distance(transform.position, destination.position);
-        float duration = distance / m_speed;
-
-        Vector3 startPos = transform.position;
-        float time = 0f;
-        while (time < duration)
+        if (m_enemyToShoot != null)
         {
-            if (destination == null)
-            {
-                Destroy(gameObject);
-                yield break;
-            }
-
-            transform.position = Vector3.Lerp(startPos, destination.position, time / duration);
-            time += Time.deltaTime;
-            yield return null;
+            m_enemyPosition = m_enemyToShoot.transform.position;
+            isTargetEnemyDie = true;
         }
-        //transform.position = destination.position;
-        Destroy(gameObject);
     }
+
+    protected virtual void Update()
+    {
+        if (Vector3.Distance(m_enemyPosition, transform.position) >= 0.2f)
+        {
+            transform.LookAt(m_enemyPosition);
+            transform.position = Vector3.MoveTowards(this.transform.position, m_enemyPosition, m_speed);
+        }
+        else
+        {
+            if (NetworkManager.Singleton.IsServer)
+            {
+                OnHitTarget();
+            }
+            OnDestroyObject();
+            return;
+        }
+    }
+
+    protected virtual void OnHitTarget()
+    {
+
+    }
+
+    protected virtual void OnDestroyObject()
+    {
+        
+    }
+
+    protected virtual void LateUpdate()
+    {
+        if (m_enemyToShoot != null)
+        {
+            m_enemyPosition = m_enemyToShoot.transform.position;
+        }
+    }
+
+    public void SetEnenyToShoot(Enemy enemyToShoot) => m_enemyToShoot = enemyToShoot;
+    public void SetAttackPower(float damage) => m_attackPower = damage;
+
+    public void SetShootTowerID(int ID) => m_shootTowerID = ID;
 }

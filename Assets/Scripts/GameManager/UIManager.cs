@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : NetworkBehaviour
 {
@@ -25,15 +26,26 @@ public class UIManager : NetworkBehaviour
 
     private void Update()
     {
+        UIElementReference.Instance.m_turnText.GetComponent<TMP_Text>().text = GameStateManager.Instance.GetGameTurn().ToString();
         if (NetworkManager.Singleton.IsClient && !m_papartionTimerCountDownTriggered)
         {
             if (Time.time >= m_preparationTimer)
             {
+                UIElementReference.Instance.m_player1GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[0].ToString();
+                UIElementReference.Instance.m_player2GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[1].ToString();
+                UIElementReference.Instance.m_player3GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[2].ToString();
+                UIElementReference.Instance.m_player4GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[3].ToString();
+
+                UIElementReference.Instance.m_player1HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(0).ToString();
+                UIElementReference.Instance.m_player2HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(1).ToString();
+                UIElementReference.Instance.m_player3HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(2).ToString();
+                UIElementReference.Instance.m_player4HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(3).ToString();
+
                 //Enter Battle State
                 print($"Local Client ID: {GameNetworkManager.Instance.GetPlayerID()}");
                 m_papartionTimerCountDownTriggered = true;
-                UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "EnteredBattleState";
-                print("Changing EnteredBattleState text");
+                UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "";
+                GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_enterBattleStateSound);
             }
             else
             {
@@ -49,13 +61,13 @@ public class UIManager : NetworkBehaviour
             {
                 //Enter Next Paparation State
                 m_reposeTimerCountDownTriggered = true;
-                if(GameStateManager.Instance.GetGameTurn() % GameStateManager.Instance.GetAuctionStateTriggerCount() == 0)
+                if (GameStateManager.Instance.GetGameTurn() % GameStateManager.Instance.GetAuctionStateTriggerCount() == 0)
                 {
-                    UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "EnteredAuctionEvent!!!";
+                    UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "";
                 }
                 else
                 {
-                    UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "EnteredParationState";
+                    UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = "";
                 }
             }
             else
@@ -82,18 +94,18 @@ public class UIManager : NetworkBehaviour
 
     private void OnEnterPreparationState(params object[] param)
     {
-        m_stateText.Value = "State: Preparation";
-        
+        m_stateText.Value = "Preparation";
+
     }
 
     private void OnEnterBattleState(params object[] param)
     {
-        m_stateText.Value = "State: Battle";
+        m_stateText.Value = "Battle";
     }
 
     private void OnEnterReposeState(params object[] param)
     {
-        m_stateText.Value = "State: Repose";
+        m_stateText.Value = "Repose";
     }
 
     private void OnEnterAuctionState(params object[] param)
@@ -104,6 +116,10 @@ public class UIManager : NetworkBehaviour
     private void OnEnterAuctionStateClientRpc()
     {
         UIElementReference.Instance.m_auctionPanel.SetActive(true);
+        UIElementReference.Instance.m_player1GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[0].ToString();
+        UIElementReference.Instance.m_player2GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[1].ToString();
+        UIElementReference.Instance.m_player3GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[2].ToString();
+        UIElementReference.Instance.m_player4GoldText.GetComponent<Text>().text = PlayerStatsManager.Instance.m_playersGoldList[3].ToString();
     }
 
 
@@ -123,10 +139,10 @@ public class UIManager : NetworkBehaviour
     [ClientRpc]
     private void ModifyHealthUIClientRpc(int healthAmount, int modifierID)
     {
-        if(modifierID == (int)NetworkManager.Singleton.LocalClientId)
-        {
-            UIElementReference.Instance.m_healthText.GetComponent<TMP_Text>().text = healthAmount.ToString();
-        }
+        UIElementReference.Instance.m_player1HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(0).ToString();
+        UIElementReference.Instance.m_player2HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(1).ToString();
+        UIElementReference.Instance.m_player3HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(2).ToString();
+        UIElementReference.Instance.m_player4HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(3).ToString();
     }
 
     [ClientRpc]
@@ -152,10 +168,10 @@ public class UIManager : NetworkBehaviour
     [ClientRpc]
     private void ModifyGoldUIClientRpc(int goldAmount, int modifierID)
     {
-        if (modifierID == (int)NetworkManager.Singleton.LocalClientId)
-        {
-            UIElementReference.Instance.m_goldText.GetComponent<TMP_Text>().text = goldAmount.ToString();
-        }
+        UIElementReference.Instance.m_player1StatusGoldText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerGold(0).ToString();
+        UIElementReference.Instance.m_player2StatusGoldText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerGold(1).ToString();
+        UIElementReference.Instance.m_player3StatusGoldText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerGold(2).ToString();
+        UIElementReference.Instance.m_player4StatusGoldText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerGold(3).ToString();
     }
 
     [ClientRpc]
@@ -188,7 +204,7 @@ public class UIManager : NetworkBehaviour
     {
         UIElementReference.Instance.m_stateText.GetComponent<TMP_Text>().text = current.ToString();
         print(1);
-        if (current.Equals("State: Preparation"))
+        if (current.Equals("Preparation"))
         {
             print(2);
             UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = GameStateManager.Instance.GetPreparationTime().ToString();
@@ -199,12 +215,12 @@ public class UIManager : NetworkBehaviour
             m_timerText = GameStateManager.Instance.GetPreparationTime();
             print(3);
         }
-        else if (current.Equals("State: Battle"))
+        else if (current.Equals("Battle"))
         {
             UIElementReference.Instance.m_mobsremainingText.GetComponent<TMP_Text>().text = EnemyManager.Instance.GetEnenyRemaining(GameNetworkManager.Instance.GetPlayerID()).ToString();
             print($"GameNetworkManager.Instance.GetPlayerID() {GameNetworkManager.Instance.GetPlayerID()}");
         }
-        else if(current.Equals("State: Repose"))
+        else if (current.Equals("Repose"))
         {
             UIElementReference.Instance.m_timerText.GetComponent<TMP_Text>().text = GameStateManager.Instance.GetReposeTime().ToString();
 

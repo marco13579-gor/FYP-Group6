@@ -9,4 +9,11 @@ public class GameObjectReference : Singleton<GameObjectReference>
     public GameObject m_spawnPoint1;
     public GameObject m_spawnPoint2;
     public GameObject m_spawnPoint3;
+
+    public GameObject m_floatingText;
+    public GameObject m_floatingRewardGoldText;
+
+    public GameObject cameraFocusPoint;
+
+    public AudioSource m_audioSource;
 }

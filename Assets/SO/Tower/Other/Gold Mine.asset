@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7cf844c0f87f09419ad13ded15778cb, type: 3}
+  m_Name: Gold Mine
+  m_EditorClassIdentifier: 
+  m_name: Gold Mine
+  m_towerType: 18
+  m_attackPower: 10
+  m_attackSpeed: 0
+  m_attackRange: 0.1
+  m_isAreaAttack: 0
+  m_cost: 30
+  m_tileToBuild: 010000000200000004000000
+  m_offset: {x: 1, y: 1, z: 0}
+  m_sprite: {fileID: 21300000, guid: 64bac34fa51610f45a5be37ef90c36fe, type: 3}
+  m_desritption: On repose state, player gain gold according to tower's atk power
+    * turn value.

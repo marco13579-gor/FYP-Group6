@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
 
-public class Tower : NetworkBehaviour
+public abstract class Tower : NetworkBehaviour
 {
     [Header("Setup In Unity")]
     public TowerSO m_towerSO;
@@ -20,6 +20,10 @@ public class Tower : NetworkBehaviour
     private Transform m_shootingPosition;
     [SerializeField]
     private GameObject m_towerCollider;
+    [SerializeField]
+    private GameObject m_attackObject;
+    [SerializeField]
+    private List<GameObject> m_meshRenderer;
 
     //NetworkVariables
     private NetworkVariable<int> m_towerID = new NetworkVariable<int>();
@@ -36,14 +40,26 @@ public class Tower : NetworkBehaviour
     private float m_towerAttackSpeed;
     private float m_towerAttackRange;
 
+    private bool m_isAreaAttack;
+
     private int m_upgradeRequiredGold;
 
     //Shooting Countdown
     private float m_nextShootTime = 0;
 
+    //Upgrade Effect
+    [SerializeField]
+    private GameObject m_towerUpgradeEffect;
+    private float m_effectEnableTimer = 0;
+
     private void Awake()
     {
         Init();
+    }
+
+    private void Start()
+    {
+        GameEventReference.Instance.OnEnterReposeState.AddListener(OnEnterReposeState);
     }
 
     private void Update()
@@ -51,8 +67,25 @@ public class Tower : NetworkBehaviour
         if (!m_isPlaced)
             return;
 
-        if (IsServer && m_targetEnemy != null)
+        if (IsServer && m_targetEnemy != null && m_targetEnemy.TryGetComponent<NetworkObject>(out NetworkObject nobj))
             Shoot(m_targetEnemy);
+
+        //Upgrade Effect logic
+        if (m_effectEnableTimer >= Time.time)
+        {
+            if (m_towerUpgradeEffect.activeSelf == false)
+            {
+                m_towerUpgradeEffect.SetActive(true);
+            }
+        }
+        else
+        {
+            if (m_towerUpgradeEffect.activeSelf == true)
+            {
+                m_towerUpgradeEffect.SetActive(false);
+            }
+        }
+
     }
 
     private void Init()
@@ -62,6 +95,8 @@ public class Tower : NetworkBehaviour
         m_towerAttackPower = m_towerSO.m_attackPower;
         m_towerAttackSpeed = m_towerSO.m_attackSpeed;
         m_towerAttackRange = m_towerSO.m_attackRange;
+
+        m_isAreaAttack = m_towerSO.m_isAreaAttack;
 
         m_upgradeRequiredGold = m_towerSO.m_cost;
 
@@ -81,25 +116,40 @@ public class Tower : NetworkBehaviour
             return;
         }
 
-        target.HurtEnemy(m_towerAttackPower);
-        ShootEffectClientRpc(m_targetEnemy.GetComponent<NetworkObject>().NetworkObjectId);
+        ShootEffectClientRpc(target);
+        if (!m_isAreaAttack)
+        {
+        }
+        else if (m_isAreaAttack)
+        {
+
+        }
         m_nextShootTime = Time.time + m_towerAttackSpeed;
     }
 
-    [ClientRpc]
-    private void ShootEffectClientRpc(ulong target)
+    private void OnEnterReposeState(params object[] param)
     {
-        var attackObject = Instantiate(m_towerSO.m_attackObject, m_shootingPosition.transform.position, quaternion.identity);
-
-        var networkObjects = FindObjectsOfType<NetworkObject>();
-        foreach (var netObj in networkObjects)
+        if (NetworkManager.Singleton.IsServer)
         {
-            if (netObj.NetworkObjectId != target)
-                continue;
-
-            attackObject.SetDestination(netObj.transform);
-            break;
+            ReposeAction();
         }
+    }
+
+    protected virtual void ReposeAction()
+    {
+
+    }
+
+    [ClientRpc]
+    private void ShootEffectClientRpc(NetworkBehaviourReference target)
+    {
+        Enemy enemyToShoot;
+        target.TryGet(out enemyToShoot);
+
+        GameObject attackObject = Instantiate(m_attackObject, m_shootingPosition.transform.position, quaternion.identity);
+        attackObject.GetComponent<Projectile>().SetEnenyToShoot(enemyToShoot);
+        attackObject.GetComponent<Projectile>().SetAttackPower(m_towerAttackPower);
+        attackObject.GetComponent<Projectile>().SetShootTowerID(GetTowerID());
     }
 
     public int GetTowerID() => m_towerID.Value;
@@ -112,15 +162,32 @@ public class Tower : NetworkBehaviour
 
     public void UpgradeCoreAttackSpeed() => m_towerAttackSpeed = m_towerAttackSpeed - (m_towerAttackSpeed / 10);
     public void UpgradeCoreAttackPower() => m_towerAttackPower = m_towerAttackPower * 1.15f;
-    public void UpgradeCoreAttackRange() 
+    public void UpgradeCoreAttackRange()
     {
         m_towerAttackRange = m_towerAttackRange * 1.05f;
         m_towerRangeIndiactor.transform.localScale = new Vector3(m_towerAttackRange, 1f, m_towerAttackRange);
+        m_towerCollider.GetComponent<SphereCollider>().radius = m_towerAttackRange;
     }
 
+    public void EnableUpgradeEffect()
+    {
+        m_effectEnableTimer = Time.time + 2f;
+    }
+
+    public float GetAttackPower() => m_towerAttackPower;
+
+    public float GetAttackRange() => m_towerAttackRange;
+    public float GetAttackSpeed() => m_towerAttackSpeed;
+
     public int GetUpgradeRequiredGold() => m_upgradeRequiredGold;
+
     public void UpgradeGoldIncrease() => m_upgradeRequiredGold = m_upgradeRequiredGold * 2;
 
     public void TurnOnRangeIndiactor() => m_towerRangeIndiactor.SetActive(true);
+
     public void TurnOffRangeIndiactor() => m_towerRangeIndiactor.SetActive(false);
+
+    public List<GameObject> GetMeshRenderer() => m_meshRenderer;
+
+    public void RemoveTarget() => m_targetEnemy = null;
 }

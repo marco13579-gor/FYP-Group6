@@ -34,6 +34,19 @@ public class UIElementReference : Singleton<UIElementReference>
     public GameObject m_towerUpgradeTowerAttackSpeedText;
     public GameObject m_towerUpgradeTowerAttackRangeButton;
     public GameObject m_towerUpgradeTowerAttackRangeText;
+    public GameObject m_towerTargetConditionFirstTargetButton;
+    public GameObject m_towerTargetConditionLastTargetButton;
+    public GameObject m_towerTargetConditionMaxHealthButton;
+    public GameObject m_towerTargetConditionMinHealthButton;
+    public GameObject m_towerTargetConditionMaxSpeedButton;
+    public GameObject m_towerTargetConditionMinSpeedButton;
+    public GameObject m_removeTowerButton;
+    public GameObject m_towerImage;
+    public GameObject m_attackPowerText;
+    public GameObject m_attackRangeText;
+    public GameObject m_attacSpeedText;
+    public GameObject m_currentAtkMode;
+    public GameObject m_desriptionText;
 
     public GameObject m_auctionPanel;
     public GameObject m_auctionCardSlot;
@@ -46,4 +59,28 @@ public class UIElementReference : Singleton<UIElementReference>
     public GameObject m_player2GoldText;
     public GameObject m_player3GoldText;
     public GameObject m_player4GoldText;
+
+    public GameObject m_EndGamePanel;
+    public GameObject m_victoryGame;
+    public GameObject m_loseGame;
+
+    public GameObject m_player1StatusObject;
+    public GameObject m_player2StatusObject;
+    public GameObject m_player3StatusObject;
+    public GameObject m_player4StatusObject;
+    public GameObject m_player1HealthText;
+    public GameObject m_player2HealthText;
+    public GameObject m_player3HealthText;
+    public GameObject m_player4HealthText;
+    public GameObject m_player1StatusGoldText;
+    public GameObject m_player2StatusGoldText;
+    public GameObject m_player3StatusGoldText;
+    public GameObject m_player4StatusGoldText;
+
+    public GameObject m_restartGameButton;
+    public GameObject m_turnText;
+
+    public GameObject m_loseGamePanel;
+    public GameObject m_restartButton;
+    public GameObject m_loseGameButton;
 }

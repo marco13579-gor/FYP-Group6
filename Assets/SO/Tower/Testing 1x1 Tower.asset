@@ -12,13 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7cf844c0f87f09419ad13ded15778cb, type: 3}
   m_Name: Testing 1x1 Tower
   m_EditorClassIdentifier: 
-  m_name: Testing 1x1 Tower
+  m_name: IceTower(Alt)
   m_towerType: 0
-  m_attackPower: 5
+  m_attackPower: 20
   m_attackSpeed: 1
   m_attackRange: 5
   m_cost: 1
-  m_attackObject: {fileID: -6359516543417215000, guid: 491091de234f7d24a807b30241d98c95, type: 3}
   m_tileToBuild: 
   m_offset: {x: 0.5, y: 0, z: 0.5}
   m_sprite: {fileID: 21300000, guid: 38fbb70f495301e4e8fdf09608e97353, type: 3}

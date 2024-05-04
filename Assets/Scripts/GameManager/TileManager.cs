@@ -6,6 +6,11 @@ using UnityEngine.Tilemaps;
 
 public class TileManager : NetworkedSingleton<TileManager>
 {
+    [SerializeField]
+    private Material m_tileMat;
+    [SerializeField]
+    private Material m_tilePlacedMat;
+
     private Dictionary<int, GameObject> m_tiles = new Dictionary<int, GameObject>();
 
     private void Start()
@@ -16,6 +21,7 @@ public class TileManager : NetworkedSingleton<TileManager>
     private void SetUpListeners()
     {
         GameEventReference.Instance.OnTowerPlaced.AddListener(OnTowerPlaced);
+        GameEventReference.Instance.OnTowerRemoved.AddListener(OnTowerRemoved);
     }
 
     private void OnTowerPlaced(params object[] param)
@@ -30,16 +36,48 @@ public class TileManager : NetworkedSingleton<TileManager>
         AddTilesPlacedClientRpc(m_tileToBuild, tileID);
     }
 
+    private void OnTowerRemoved(params object[] param)
+    {
+        GameObject[] m_usedTiles = (GameObject[])param[1];
+
+        int[] tilesIDList = new int[m_usedTiles.Length];
+
+        for (int i = 0; i < m_usedTiles.Length; i++)
+        {
+            tilesIDList[i] = m_usedTiles[i].GetComponent<Tiles>().GetTilesID();
+        }
+
+        for (int i = 0; i < tilesIDList.Length; i++)
+        {
+            GameObject tileToRemovePlaced = m_tiles[tilesIDList[i]];
+            tileToRemovePlaced.GetComponent<Tiles>().m_isPlaced = false;
+        }
+        RemoveTilesPlacedClientRpc(tilesIDList);
+    }
+
     [ClientRpc]
     private void AddTilesPlacedClientRpc(int[] m_tileToBuild, int tileID)
     {
-        print("AddTilesPlacedClientRpc");
         m_tiles[tileID].GetComponent<Tiles>().m_isPlaced = true;
+        m_tiles[tileID].GetComponent<Tiles>().GetComponent<MeshRenderer>().material = m_tilePlacedMat;
 
         for (int i = 0; i < m_tileToBuild.Length; i++)
         {
             GameObject currentNearbyTile = m_tiles[tileID].GetComponent<Tiles>().m_tilesNearby[m_tileToBuild[i]].gameObject;
             currentNearbyTile.GetComponent<Tiles>().m_isPlaced = true;
+            currentNearbyTile.GetComponent<Tiles>().GetComponent<MeshRenderer>().material = m_tilePlacedMat;
+        }
+    }
+
+    [ClientRpc]
+    private void RemoveTilesPlacedClientRpc(int[] m_tileToBuild)
+    {
+        print("RemoveTilesPlacedClientRpc");
+        for (int i = 0; i < m_tileToBuild.Length; i++)
+        {
+            GameObject tileToRemovePlaced = m_tiles[m_tileToBuild[i]];
+            tileToRemovePlaced.GetComponent<Tiles>().m_isPlaced = false;
+            tileToRemovePlaced.GetComponent<Tiles>().GetComponent<MeshRenderer>().material = m_tileMat;
         }
     }
 
@@ -93,7 +131,7 @@ public class TileManager : NetworkedSingleton<TileManager>
         }
         else
         {
-            Debug.LogError("Invalid Tower: " + gameObj.name);
+            Debug.LogError("Invalid Tile: " + gameObj.name);
         }
     }
 }

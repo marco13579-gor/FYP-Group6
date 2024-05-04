@@ -1,15 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class AuctionManager : NetworkedSingleton<AuctionManager>
 {
-    [SerializeField]
-    private GameObject m_auctionCardSlot;
-
     private bool m_isAuctionStateFirstTrigger = false;
     private bool m_isTurnChangeTrigger = false;
     private NetworkVariable<int> m_currentPlayerTurn = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -19,6 +17,7 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
 
     private bool[] m_playerGiveUpList;
     private int m_playersGaveUp = 0;
+    private int m_rewardCardIndex;
 
     private void Start()
     {
@@ -42,7 +41,7 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
                 m_currentPlayerTurn.Value = 0;
             }
 
-            TurnChangeClientRpc(m_currentPlayerTurn.Value);
+            TurnChangeClientRpc(m_currentPlayerTurn.Value, m_currentPlayerTurn.Value, m_highestBid.Value);
 
             ++m_currentPlayerTurn.Value;
 
@@ -51,10 +50,16 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
     }
 
     [ClientRpc]
-    private void TurnChangeClientRpc(int playerTurnIndex)
+    private void TurnChangeClientRpc(int playerTurnIndex, int playerTurn, int highestBidAmount)
     {
         if (playerTurnIndex == GameNetworkManager.Instance.GetPlayerID())
         {
+            if (PlayerStatsManager.Instance.GetLoseStatus())
+            {
+                OnGiveUpButtonClicked();
+                return;
+            }
+
             UIElementReference.Instance.m_bidButton.GetComponent<Button>().interactable = true;
             UIElementReference.Instance.m_giveupButton.GetComponent<Button>().interactable = true;
 
@@ -72,7 +77,8 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
             UIElementReference.Instance.m_bidAmountInputField.GetComponent<InputField>().onEndEdit.RemoveListener(OnBidAmountInputChange);
         }
 
-
+        UIElementReference.Instance.m_currentBidderText.GetComponent<Text>().text = playerTurn.ToString();
+        UIElementReference.Instance.m_bidAmountText.GetComponent<Text>().text = highestBidAmount.ToString();
     }
 
     private void SetUpListeners()
@@ -82,10 +88,30 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
 
     private void OnEnterAuctionState(params object[] param)
     {
+        m_rewardCardIndex = UnityEngine.Random.Range(0, CardDatabaseReference.Instance.m_auctionCardDatabaseList.Length);
+        UpdataAuctionCardClientRpc(m_rewardCardIndex);
+
+        m_currentPlayerTurn.Value = 0;
         m_highestBid.Value = 10;
+        m_playersGaveUp = 0;
 
         m_isTurnChangeTrigger = true;
         m_isAuctionStateFirstTrigger = true;
+    }
+
+    [ClientRpc]
+    private void UpdataAuctionCardClientRpc(int rewardCardIndex)
+    {
+        if (PlayerStatsManager.Instance.GetLoseStatus()) return;
+
+        PrebuildTower towerToReward = CardDatabaseReference.Instance.m_auctionCardDatabaseList[rewardCardIndex].GetComponent<PrebuildTower>();
+
+        UIElementReference.Instance.m_auctionCardSlot.transform.GetChild(0).GetComponent<Image>().sprite = towerToReward.m_towerSO.m_sprite;
+        UIElementReference.Instance.m_auctionCardSlot.transform.GetChild(2).GetComponent<TMP_Text>().text = towerToReward.m_towerSO.m_name;
+        UIElementReference.Instance.m_auctionCardSlot.transform.GetChild(3).GetComponent<TMP_Text>().text = towerToReward.m_towerSO.m_desritption;
+        UIElementReference.Instance.m_auctionCardSlot.transform.GetChild(5).GetComponent<TMP_Text>().text = towerToReward.m_towerSO.m_cost.ToString();
+        UIElementReference.Instance.m_auctionCardSlot.transform.GetChild(6).GetComponent<TMP_Text>().text = towerToReward.m_towerSO.m_attackPower.ToString();
+        UIElementReference.Instance.m_auctionCardSlot.transform.GetChild(7).GetComponent<TMP_Text>().text = towerToReward.m_towerSO.m_attackRange.ToString();
     }
 
     public void OnBidButtonClicked()
@@ -99,6 +125,12 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
         if (m_highestBid.Value + m_minimumBidAmount > m_bidAmount)
         {
             print($"bid amount must be highest + {m_minimumBidAmount}");
+            return;
+        }
+
+        if(m_bidAmount > PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()])
+        {
+            print($"You don't have enough money!");
             return;
         }
 
@@ -121,18 +153,17 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
     [ServerRpc(RequireOwnership = false)]
     private void GiveUpButtonClickedServerRpc(int playerID)
     {
-        int winPlayerIndex;
-        m_playerGiveUpList[playerID] = false;
+        m_playerGiveUpList[playerID] = true;
         ++m_playersGaveUp;
 
         if (m_playersGaveUp >= GameNetworkManager.Instance.GetPlayerNumber() - 1)
         {
             for (int i = 0; i < m_playerGiveUpList.Length; i++)
             {
-                if (m_playerGiveUpList[i] == true)
-                {
-                    winPlayerIndex = i;
-                    EndAuctionState(winPlayerIndex);
+                print(m_playerGiveUpList[i]);
+                if (m_playerGiveUpList[i] == false)
+                { 
+                    EndAuctionState(i);
                     return;
                 }
             }
@@ -145,16 +176,18 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
 
     private void EndAuctionState(int winPlayerIndex)
     {
-        EndAuctionStateClientRpc(winPlayerIndex);
+        EndAuctionStateClientRpc(winPlayerIndex, m_rewardCardIndex);
+        GameEventReference.Instance.OnEnterPreparationState.Trigger();
     }
 
     [ClientRpc]
-    private void EndAuctionStateClientRpc(int winPlayerIndex)
+    private void EndAuctionStateClientRpc(int winPlayerIndex, int rewardCardIndex)
     {
         UIElementReference.Instance.m_auctionPanel.SetActive(false);
         if (winPlayerIndex == GameNetworkManager.Instance.GetPlayerID())
         {
-            print("Auciton win");
+            GameEventReference.Instance.OnPlayerModifyGold.Trigger(PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - m_highestBid.Value, GameNetworkManager.Instance.GetPlayerID());
+            GameEventReference.Instance.OnAuctionEnd.Trigger(rewardCardIndex);
         }
         else
         {

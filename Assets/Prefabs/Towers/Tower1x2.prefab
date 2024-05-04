@@ -57,9 +57,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a521c74c603eea42b573da9977e14d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_enemyMask:
-    serializedVersion: 2
-    m_Bits: 128
+  m_availableTargets: []
 --- !u!1 &5107847751000047239
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,9 +199,9 @@ GameObject:
   - component: {fileID: -9167529685596509761}
   - component: {fileID: 3558247052142596489}
   - component: {fileID: -7737764915109274325}
-  - component: {fileID: 9138412069456648235}
   - component: {fileID: -6294959282201671497}
   - component: {fileID: -1428568913799108905}
+  - component: {fileID: 1914503185809165827}
   m_Layer: 6
   m_Name: Tower1x2
   m_TagString: Object
@@ -324,25 +322,6 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &9138412069456648235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8092033623652954677}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0488c1fc8c9d436479d2a9f5e5781974, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_towerSO: {fileID: 11400000, guid: 8aaa14c72a2905544bb96a4f8f38c008, type: 2}
-  m_towerRangeIndiactor: {fileID: 2078906282985296621}
-  m_shootingPosition: {fileID: 5512691221868847394}
-  m_towerCollider: {fileID: 5037489359904264568}
-  m_isPlaced: 0
-  m_usedTiles:
-  - {fileID: 0}
 --- !u!114 &-6294959282201671497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -355,9 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a521c74c603eea42b573da9977e14d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_enemyMask:
-    serializedVersion: 2
-    m_Bits: 128
+  m_availableTargets: []
 --- !u!114 &-1428568913799108905
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,6 +361,26 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
+--- !u!114 &1914503185809165827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8092033623652954677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ca59cc1439ae1941a51aa4cc2c45540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_towerSO: {fileID: 0}
+  m_towerRangeIndiactor: {fileID: 0}
+  m_shootingPosition: {fileID: 0}
+  m_towerCollider: {fileID: 0}
+  m_attackObject: {fileID: 0}
+  m_meshRenderer: []
+  m_isPlaced: 0
+  m_usedTiles: []
 --- !u!1001 &1034551779253462113
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -441,11 +438,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 468b1c0b67c583c439603e4269a122bf, type: 3}
---- !u!1 &2078906282985296621 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1333827878047725196, guid: 468b1c0b67c583c439603e4269a122bf, type: 3}
-  m_PrefabInstance: {fileID: 1034551779253462113}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1698440433855285335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1858128264291970102, guid: 468b1c0b67c583c439603e4269a122bf, type: 3}

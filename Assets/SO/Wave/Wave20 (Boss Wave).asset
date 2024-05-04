@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 267e6ef6dd85ca442a30def7e2197eaf, type: 3}
+  m_Name: Wave20 (Boss Wave)
+  m_EditorClassIdentifier: 
+  m_enemiesCount: 0500000005000000050000000500000001000000
+  m_enemiesType:
+  - {fileID: 8961246985013566124, guid: ac43833878f2ed241b612bde45a005b0, type: 3}
+  - {fileID: 1820142580768629400, guid: d28dbc8200f2bff46822aa4d767b5f0b, type: 3}
+  - {fileID: 3580773116083784143, guid: 420bdd3c649d37b4880338e402110318, type: 3}
+  - {fileID: 3580773116083784143, guid: 420bdd3c649d37b4880338e402110318, type: 3}
+  - {fileID: 672797433847758437, guid: 5d83242fcfa6ae14d8d7efc2a24814e7, type: 3}

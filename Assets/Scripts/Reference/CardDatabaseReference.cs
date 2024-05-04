@@ -6,4 +6,6 @@ public class CardDatabaseReference : Singleton<CardDatabaseReference>
 {
     //Tower Must be Prebuild
     public GameObject[] m_cardDatabaseList;
+
+    public GameObject[] m_auctionCardDatabaseList;
 }

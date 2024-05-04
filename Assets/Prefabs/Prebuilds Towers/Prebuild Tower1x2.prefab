@@ -57,9 +57,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a521c74c603eea42b573da9977e14d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_enemyMask:
-    serializedVersion: 2
-    m_Bits: 128
+  m_availableTargets: []
 --- !u!1 &5107847751000047239
 GameObject:
   m_ObjectHideFlags: 0
@@ -152,7 +150,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: e487dbbcff3a8344ea27427297457451, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -255,7 +253,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: e487dbbcff3a8344ea27427297457451, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -331,7 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2186245c121474a95a1461c3dff319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_toBuildTower: {fileID: 9138412069456648235, guid: 5a77faee82e940a428366218e6387137, type: 3}
+  m_toBuildTower: {fileID: 1914503185809165827, guid: 5a77faee82e940a428366218e6387137, type: 3}
   m_rangeIndiactor: {fileID: 6502870582439983149}
   m_towerSO: {fileID: 11400000, guid: 8aaa14c72a2905544bb96a4f8f38c008, type: 2}
 --- !u!114 &7116582500090201033

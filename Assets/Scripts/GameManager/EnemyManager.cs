@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.VisualScripting;
 
 public class EnemyManager : NetworkedSingleton<EnemyManager>
 {
@@ -35,6 +37,548 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
     {
         GameEventReference.Instance.OnEnterBattleState.AddListener(OnEnterBattleState);
         GameEventReference.Instance.OnEnemyDestroyed.AddListener(OnEnemyDestroyed);
+        GameEventReference.Instance.OnEnemyHurt.AddListener(OnEnemyHurt);
+        GameEventReference.Instance.OnEnemyIgnited.AddListener(OnEnemyIgnited);
+        GameEventReference.Instance.OnDealScaredDamageOnIgnitedTarget.AddListener(OnDealScaredDamageOnIgnitedTarget);
+        GameEventReference.Instance.OnDealScaredDamageOnIgnitedAmountTarget.AddListener(OnDealScaredDamageOnIgnitedAmountTarget);
+        GameEventReference.Instance.OnDealScaredDamageOnSlowedTarget.AddListener(OnDealScaredDamageOnSlowedTarget);
+        GameEventReference.Instance.OnDealScaredDamageOnStunnedTarget.AddListener(OnDealScaredDamageOnStunnedTarget);
+
+        GameEventReference.Instance.OnDealScaredDamageOnStunnedAndSlowedTarget.AddListener(OnDealScaredDamageOnStunnedAndSlowedTarget);
+        GameEventReference.Instance.OnDealScaredDamageOnSlowedTargetOrSlowTarget.AddListener(OnDealScaredDamageOnSlowedTargetOrSlowTarget);
+        GameEventReference.Instance.OnIgniteStunnedTarget.AddListener(OnIgniteStunnedTarget);
+        GameEventReference.Instance.OnDealScaredDamageAndSlowTargetOnStunnedTarget.AddListener(OnDealScaredDamageAndSlowTargetOnStunnedTarget);
+        GameEventReference.Instance.OnDealScaredDamageOnIgnitedAndStunnedTarget.AddListener(OnDealScaredDamageOnIgnitedAndStunnedTarget);
+        GameEventReference.Instance.OnDealScaredDamageAndSlowOnStunnedEnemy.AddListener(OnDealScaredDamageAndSlowOnStunnedEnemy);
+        GameEventReference.Instance.OnIgniteStunnedEnemy.AddListener(OnIgniteStunnedEnemy);
+
+        GameEventReference.Instance.OnExecuteIgnitedEnemy.AddListener(OnExecuteIgnitedEnemy);
+        GameEventReference.Instance.OnExecuteSlowedEnemy.AddListener(OnExecuteSlowedEnemy);
+        GameEventReference.Instance.OnExecuteStunnedEnemy.AddListener(OnExecuteStunnedEnemy);
+        GameEventReference.Instance.OnExecuteEnemy.AddListener(OnExecuteEnemy);
+
+        GameEventReference.Instance.OnEnemySlowed.AddListener(OnEnemySlowed);
+        GameEventReference.Instance.OnEnemyStunned.AddListener(OnEnemyStunned);
+    }
+
+    private void OnEnemySlowed(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float scale = (float)param[1];
+        float slowDuration = (float)param[2];
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (!m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisSlowed())
+            {
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyisSlowed(true);
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemySlowParam(slowDuration, scale);
+            }
+        }
+    }
+
+    private void OnEnemyIgnited(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        int TowerID = (int)param[2];
+        int triggerCount = (int)param[3];
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().ContainsKey(TowerID))
+            {
+                print("Ignite tower same");
+                return;
+            }
+        }
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID] != null)
+            {
+                UpdataIgnitedDictionaryClientRpc(enemyID, TowerID, damage);
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyIgnited(true);
+                StartCoroutine(IHurtEnemy(enemyID, damage, triggerCount, TowerID));
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void UpdataIgnitedDictionaryClientRpc(int enemyID, int towerID, float damage)
+    {
+        //m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyIgnitedDictionary(towerID, damage);
+    }
+
+    private IEnumerator IHurtEnemy(int ID, float damage, int triggerTime, int towerID)
+    {
+        int attackCount = triggerTime;
+        float nextTriggerTime = 0.9f;
+        float timer = nextTriggerTime;
+        while (true)
+        {
+            timer -= Time.deltaTime;
+            if (timer <= 0)
+            {
+                timer = nextTriggerTime;
+                --attackCount;
+                if (m_SpawnedEnemies.ContainsKey(ID))
+                {
+                    m_SpawnedEnemies[ID].GetComponent<Enemy>().Hurt(damage);
+                }
+
+                if (attackCount == 0)
+                {
+                    if (m_SpawnedEnemies.ContainsKey(ID))
+                    {
+                        m_SpawnedEnemies[ID].GetComponent<Enemy>().RemoveIgnitedDictionaryKey(towerID);
+                    }
+                    break;
+                }
+            }
+            yield return null;
+        }
+        yield return null;
+    }
+
+    private void OnDealScaredDamageOnIgnitedTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+
+        bool isIgnited = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().Count >= 1)
+            {
+                isIgnited = true;
+            }
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        float extraDamage = damage * extraDamageScale;
+        if (isIgnited)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(extraDamage);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnDealScaredDamageOnIgnitedAmountTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+
+        int ignitedAmount = 0;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            ignitedAmount = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().Count;
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (ignitedAmount > 0)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale * ignitedAmount);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnDealScaredDamageOnSlowedTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+
+        bool isSlowed = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            isSlowed = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisSlowed();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (isSlowed)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnEnemyStunned(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float duration = (float)param[1];
+
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            isStunned = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisStuned();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyisStunned(true);
+        m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyStunParam(duration);
+    }
+
+    private void OnDealScaredDamageOnStunnedTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            isStunned = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisStuned();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (isStunned)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnDealScaredDamageOnStunnedAndSlowedTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+
+        bool isSlowed = false;
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            isStunned = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisStuned();
+            isSlowed = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisSlowed();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (isStunned && isSlowed)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnDealScaredDamageOnSlowedTargetOrSlowTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+        float slowScale = (float)param[3];
+        float slowDuration = (float)param[4];
+
+        bool isSlowed = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            isSlowed = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisSlowed();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (isSlowed)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+            GameEventReference.Instance.OnEnemySlowed.Trigger(enemyID, slowScale, slowDuration);
+        }
+    }
+    private void OnDealScaredDamageAndSlowTargetOnStunnedTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+
+        float slowScale = (float)param[3];
+        float slowDuration = (float)param[4];
+
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            isStunned = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisStuned();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (isStunned)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale);
+            GameEventReference.Instance.OnEnemySlowed.Trigger(enemyID, slowScale, slowDuration);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnIgniteStunnedTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        int TowerID = (int)param[2];
+        int triggerCount = (int)param[3];
+
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            isStunned = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisStuned();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (isStunned)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+            GameEventReference.Instance.OnEnemyIgnited.Trigger(enemyID, damage, TowerID, triggerCount);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnDealScaredDamageOnIgnitedAndStunnedTarget(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+
+        bool isStunned = false;
+        bool isIgnited = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().Count > 0)
+            {
+                isIgnited = true;
+            }
+
+            isStunned = m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisStuned();
+        }
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if (isStunned && isIgnited)
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale);
+        }
+        else
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
+    }
+
+    private void OnDealScaredDamageAndSlowOnStunnedEnemy(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+        float extraDamageScale = (float)param[2];
+        float slowScale = (float)param[3];
+        float slowDuration = (float)param[4];
+
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().Count > 0)
+            {
+                isStunned = true;
+            }
+
+            if (!m_SpawnedEnemies.ContainsKey(enemyID))
+                return;
+
+            if (isStunned)
+            {
+                GameEventReference.Instance.OnEnemySlowed.Trigger(enemyID, slowScale, slowDuration);
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage * extraDamageScale);
+            }
+            else
+            {
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+            }
+        }
+    }
+
+    private void OnIgniteStunnedEnemy(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+
+        int TowerID = (int)param[2];
+        float burnDamage = (float)param[3];
+        int burnCount = (int)param[4];
+
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().Count > 0)
+            {
+                isStunned = true;
+            }
+
+            if (!m_SpawnedEnemies.ContainsKey(enemyID))
+                return;
+
+            if (isStunned)
+            {
+                GameEventReference.Instance.OnEnemyIgnited.Trigger(enemyID, burnDamage, TowerID, burnCount);
+            }
+        }
+    }
+
+    private void OnExecuteIgnitedEnemy(params object[] param)
+    {
+        int enemyID = (int)param[0];
+
+        int TowerID = (int)param[1];
+        float scaleHpToExecute = (float)param[2];
+
+        bool isIgnited = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().Count > 0)
+            {
+                isIgnited = true;
+            }
+
+            if (!m_SpawnedEnemies.ContainsKey(enemyID))
+                return;
+
+            if (isIgnited && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+            {
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
+            }
+        }
+    }
+
+    private void OnExecuteSlowedEnemy(params object[] param)
+    {
+        int enemyID = (int)param[0];
+
+        int TowerID = (int)param[1];
+        float scaleHpToExecute = (float)param[2];
+
+        bool isSlowed = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisSlowed())
+            {
+                isSlowed = true;
+            }
+
+            if (!m_SpawnedEnemies.ContainsKey(enemyID))
+                return;
+
+            if (isSlowed && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+            {
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
+            }
+        }
+    }
+
+    private void OnExecuteStunnedEnemy(params object[] param)
+    {
+        int enemyID = (int)param[0];
+
+        int TowerID = (int)param[1];
+        float scaleHpToExecute = (float)param[2];
+
+        bool isStunned = false;
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyisStuned())
+            {
+                isStunned = true;
+            }
+
+            if (!m_SpawnedEnemies.ContainsKey(enemyID))
+                return;
+
+            if (isStunned && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+            {
+                m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
+            }
+        }
+    }
+
+    private void OnExecuteEnemy(params object[] param)
+    {
+        int enemyID = (int)param[0];
+
+        int TowerID = (int)param[1];
+        float scaleHpToExecute = (float)param[2];
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+
+        if ((m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Executed();
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
+        }
+
+    }
+
+    private void OnEnemyHurt(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float damage = (float)param[1];
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(damage);
+        }
     }
 
     private void OnEnemyDie(params object[] param)
@@ -76,6 +620,7 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
     private void Update()
     {
         if (!IsServer) return;
+        if (PlayerStatsManager.Instance.GetLoseStatus()) return;
 
         int m_waveEnemyRemaining = 0;
 
@@ -101,10 +646,13 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
 
         for (int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
         {
-            Enemy enemy = Instantiate(m_currentWave.m_enemiesType[enemyTypeIndex]);
-            enemy.SetPlayerMap(i);
+            if (PlayerStatsManager.Instance.m_playersHealthList[i] > 0)
+            {
+                Enemy enemy = Instantiate(m_currentWave.m_enemiesType[enemyTypeIndex]);
+                enemy.SetPlayerMap(i);
 
-            enemy.GetComponent<NetworkObject>().Spawn();
+                enemy.GetComponent<NetworkObject>().Spawn();
+            }
         }
 
         --m_waveEnemyRemainingList[enemyTypeIndex];
@@ -147,11 +695,9 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
             m_SpawnedEnemies.Remove(enemy.GetEnemyID());
         }
 
-        print($"enemy.GetComponent<Enemy>().GetPlayMap(): {enemy.GetComponent<Enemy>().GetPlayMap()}");
         if (enemy.TryGetComponent<NetworkObject>(out var networkObject) && networkObject.IsSpawned)
         {
             GameEventReference.Instance.OnEnemyDestroyed.Trigger(enemy.gameObject, enemy.GetComponent<Enemy>().GetPlayMap());
-            networkObject.Despawn();
         }
     }
 

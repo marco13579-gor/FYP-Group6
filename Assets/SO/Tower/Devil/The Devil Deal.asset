@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7cf844c0f87f09419ad13ded15778cb, type: 3}
+  m_Name: The Devil Deal
+  m_EditorClassIdentifier: 
+  m_name: The Devil Deal
+  m_towerType: 16
+  m_attackPower: 20
+  m_attackSpeed: 2
+  m_attackRange: 3
+  m_cost: 32
+  m_tileToBuild: 
+  m_offset: {x: 0.25, y: 0, z: 0.25}
+  m_sprite: {fileID: 21300000, guid: 5ab1e3a88b4c63249aeafd0624f86dc1, type: 3}
+  m_desritption: ' 6, it will turn 6 gold into 1 hp.eal. In repose state, If your
+    gold is greater than 6, it will turn 6 gold into 1 hp.'

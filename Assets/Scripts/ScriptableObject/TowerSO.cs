@@ -12,8 +12,8 @@ public class TowerSO : ScriptableObject
     public float m_attackPower;
     public float m_attackSpeed;
     public float m_attackRange;
+    public bool m_isAreaAttack;
     public int m_cost;
-    public Projectile m_attackObject;
     public int[] m_tileToBuild;
     public Vector3 m_offset;
 

@@ -12,6 +12,7 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
     [SerializeField]
     private GameObject[] m_cardSlots;
 
+    private const int m_cardSlotAmount = 5;
     private int m_randomIndex;
 
     private void Start()
@@ -23,18 +24,22 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
     {
         GameEventReference.Instance.OnEnterPreparationState.AddListener(OnEnterPreparationState);
         GameEventReference.Instance.OnPlayerConsumeCard.AddListener(OnPlayerConsumeCard);
+
+        GameEventReference.Instance.OnAuctionEnd.AddListener(OnAuctionEnd);
     }
 
     private void RefreshCardSlot(int slotIndex)
     {
+        if (PlayerStatsManager.Instance.GetLoseStatus()) return;
+
         m_cardSlots[slotIndex].SetActive(true);
         m_cardSlots[slotIndex].transform.GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
 
         int randomIndex = GetRandomCardIndex(GameStateManager.Instance.GetGameTurn());
 
-        m_cardSlots[slotIndex].transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate 
+        m_cardSlots[slotIndex].transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
         {
-            if(BuildingManager.Instance.GetPrebuildTower() == null)
+            if (BuildingManager.Instance.GetPrebuildTower() == null)
             {
                 BuildingManager.Instance.SelectTower(CardDatabaseReference.Instance.m_cardDatabaseList[randomIndex].GetComponent<PrebuildTower>());
                 BuildingManager.Instance.SetCardConsumeSlot(slotIndex);
@@ -42,6 +47,29 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
         });
 
         UpdataCardSlotVisual(slotIndex, CardDatabaseReference.Instance.m_cardDatabaseList[randomIndex].GetComponent<PrebuildTower>());
+    }
+
+    private void OnAuctionEnd(params object[] param)
+    {
+        int rewardCardIndex = (int)param[0];
+        RefreshAuctionCardSlot(rewardCardIndex);
+    }
+
+    private void RefreshAuctionCardSlot(int rewardCardIndex)
+    {
+        m_cardSlots[5].SetActive(true);
+        m_cardSlots[5].transform.GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();
+
+        m_cardSlots[5].transform.GetChild(4).GetComponent<Button>().onClick.AddListener(delegate
+        {
+            if (BuildingManager.Instance.GetPrebuildTower() == null)
+            {
+                BuildingManager.Instance.SelectTower(CardDatabaseReference.Instance.m_auctionCardDatabaseList[rewardCardIndex].GetComponent<PrebuildTower>());
+                BuildingManager.Instance.SetCardConsumeSlot(5);
+            }
+        });
+
+        UpdataCardSlotVisual(5, CardDatabaseReference.Instance.m_auctionCardDatabaseList[rewardCardIndex].GetComponent<PrebuildTower>());
     }
 
     private void OnPlayerConsumeCard(params object[] param)
@@ -58,13 +86,13 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
     [ClientRpc]
     private void RefreshCardSlotClientRpc()
     {
-        for (int i = 0; i < m_cardSlots.Length; i++)
+        for (int i = 0; i < m_cardSlotAmount; i++)
         {
             RefreshCardSlot(i);
         }
     }
 
-    private void UpdataCardSlotVisual(int slotIndex, PrebuildTower towerToBuild)
+    public void UpdataCardSlotVisual(int slotIndex, PrebuildTower towerToBuild)
     {
         m_cardSlots[slotIndex].transform.GetChild(0).GetComponent<Image>().sprite = towerToBuild.m_towerSO.m_sprite;
         m_cardSlots[slotIndex].transform.GetChild(2).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_name;
@@ -82,15 +110,43 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
 
     private int GetRandomCardIndex(int turnValue)
     {
-        if(turnValue == 0)
+        if (turnValue == 0)
         {
             turnValue = 1;
         }
+        CardDrawState cardDrawState;
+        if (turnValue <= 5)
+        {
+            cardDrawState = CardDrawState.EarlyGame;
+        }
+        else if (turnValue <= 12)
+        {
+            cardDrawState = CardDrawState.MidGame;
+        }
+        else
+        {
+            cardDrawState = CardDrawState.LateGame;
+        }
 
-        do {
+        int drawValue = 0;
+        switch (cardDrawState)
+        {
+            case CardDrawState.EarlyGame:
+                drawValue = 15;
+                break;
+            case CardDrawState.MidGame:
+                drawValue = 25; 
+                break;
+            case CardDrawState.LateGame:
+                drawValue = 40; 
+                break;
+        }
+
+        do
+        {
             m_randomIndex = UnityEngine.Random.Range(0, CardDatabaseReference.Instance.m_cardDatabaseList.Length);
 
-        } while (turnValue < CardDatabaseReference.Instance.m_cardDatabaseList[m_randomIndex].GetComponent<PrebuildTower>().m_towerSO.m_cost);
+        } while (drawValue < CardDatabaseReference.Instance.m_cardDatabaseList[m_randomIndex].GetComponent<PrebuildTower>().m_towerSO.m_cost);
         return m_randomIndex;
     }
 }
