@@ -1,17 +1,6 @@
-using Mono.Cecil;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Xml.Linq;
-using Unity.Burst.CompilerServices;
-using Unity.Collections;
-using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
+using Unity.Netcode;
 
 public class BuildingManager : NetworkedSingleton<BuildingManager>
 {

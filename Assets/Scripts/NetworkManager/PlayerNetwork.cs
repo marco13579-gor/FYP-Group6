@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
-using static PlayerNetwork;
 using Unity.Collections;
-using Unity.VisualScripting;
+using Unity.Netcode;
 
 public class PlayerNetwork : NetworkBehaviour
 {
