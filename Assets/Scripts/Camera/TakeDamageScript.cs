@@ -1,19 +1,19 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class TakeDamageScript : MonoBehaviour
 {
     public float intensity = 0;
-    PostProcessVolume _volume;
+    Volume _volume;
     Vignette _vignette;
 
     // Start is called before the first frame update
     void Start()
     {
-        _volume = GetComponent<PostProcessVolume>();
-        _volume.profile.TryGetSettings<Vignette>(out _vignette);
+        _volume = GetComponent<Volume>();
+        _volume.sharedProfile.TryGet(out _vignette);
 
         if (!_vignette)
         {
@@ -21,7 +21,7 @@ public class TakeDamageScript : MonoBehaviour
         }
         else
         {
-            _vignette.enabled.Override(false);
+            _vignette.active = false;
         }
 
     }
@@ -30,17 +30,17 @@ public class TakeDamageScript : MonoBehaviour
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
-            StartCoroutine(TakeDamageEffect()); 
+            StartCoroutine(TakeDamageEffect());
     }
 
     private IEnumerator TakeDamageEffect()
     {
         intensity = 0.4f;
 
-        _vignette.enabled.Override(true);
+        _vignette.active = true;
         _vignette.intensity.Override(0.4f);
 
-        yield return new WaitForSeconds(0.4f); 
+        yield return new WaitForSeconds(0.4f);
 
         while (intensity > 0)
         {
@@ -49,7 +49,7 @@ public class TakeDamageScript : MonoBehaviour
             _vignette.intensity.Override(intensity);
             yield return new WaitForSeconds(0.1f);
         }
-        _vignette.enabled.Override(false);
+        _vignette.active = false;
         yield break;
     }
 }
