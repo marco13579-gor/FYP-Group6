@@ -27,6 +27,11 @@ public class UIManager : NetworkBehaviour
     private void Update()
     {
         UIElementReference.Instance.m_turnText.GetComponent<TMP_Text>().text = GameStateManager.Instance.GetGameTurn().ToString();
+
+        int refreshGold = GameStateManager.Instance.GetGameTurn() * 5;
+        if (refreshGold == 0) refreshGold = 5;
+        UIElementReference.Instance.m_resetButtonText.GetComponent<TMP_Text>().text = $"${refreshGold}";
+
         if (NetworkManager.Singleton.IsClient && !m_papartionTimerCountDownTriggered)
         {
             if (Time.time >= m_preparationTimer)
@@ -143,6 +148,11 @@ public class UIManager : NetworkBehaviour
         UIElementReference.Instance.m_player2HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(1).ToString();
         UIElementReference.Instance.m_player3HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(2).ToString();
         UIElementReference.Instance.m_player4HealthText.GetComponent<TMP_Text>().text = PlayerStatsManager.Instance.GetPlayerHealth(3).ToString();
+
+        if (GameNetworkManager.Instance.GetPlayerID() == modifierID)
+        {
+            CinamachineShake.Instance.ShakeCamera(5f, 0.1f);
+        }
     }
 
     [ClientRpc]

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6411392778813969693}
   - component: {fileID: 6411392778810578237}
   - component: {fileID: 6411392778811676669}
-  - component: {fileID: -8257067318518426475}
+  - component: {fileID: 7526399471569292418}
   - component: {fileID: 5112602703188563375}
   - component: {fileID: -2662623264156223791}
   - component: {fileID: -4971991871976386465}
@@ -91,7 +91,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-8257067318518426475
+--- !u!114 &7526399471569292418
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6411392778813671741}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ca59cc1439ae1941a51aa4cc2c45540, type: 3}
+  m_Script: {fileID: 11500000, guid: c71ec5853a7d3b3489b8cea1c0592783, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_towerSO: {fileID: 11400000, guid: 468ce96d3b868434192f6874e0a49dc8, type: 2}
@@ -112,6 +112,7 @@ MonoBehaviour:
   m_isPlaced: 0
   m_usedTiles: []
   m_towerUpgradeEffect: {fileID: 2296692760420700594}
+  healthToReduce: 1
 --- !u!114 &5112602703188563375
 MonoBehaviour:
   m_ObjectHideFlags: 0

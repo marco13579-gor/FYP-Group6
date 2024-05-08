@@ -17,7 +17,8 @@ MonoBehaviour:
   m_attackPower: 18
   m_attackSpeed: 0.8
   m_attackRange: 6
-  m_cost: 25
+  m_isAreaAttack: 1
+  m_cost: 55
   m_tileToBuild: 
   m_offset: {x: 0.25, y: 0, z: 0.25}
   m_sprite: {fileID: 21300000, guid: ced9cdaea2140b348b1723cc45af3b45, type: 3}

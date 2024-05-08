@@ -11,8 +11,7 @@ public class FreezeTowerProejectile : Projectile
     protected override void OnHitTarget()
     {
         GameEventReference.Instance.OnEnemyHurt.Trigger(m_enemyToShoot.GetEnemyID(), m_attackPower);
-        GameEventReference.Instance.OnExecuteEnemy.Trigger(m_enemyToShoot.GetEnemyID(), this.m_shootTowerID, 1f);
-        //GameEventReference.Instance.OnEnemySlowed.Trigger(m_enemyToShoot.GetEnemyID(), slowScare, slowDuration);
+        GameEventReference.Instance.OnEnemySlowed.Trigger(m_enemyToShoot.GetEnemyID(), slowScare, slowDuration);
     }
 
     protected override void OnDestroyObject()

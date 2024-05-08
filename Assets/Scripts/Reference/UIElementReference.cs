@@ -17,15 +17,6 @@ public class UIElementReference : Singleton<UIElementReference>
     public GameObject m_warningText;
 
     public GameObject m_roomPanel;
-    public GameObject m_roomCodeText;
-    public GameObject m_startGameButton;
-    public GameObject m_clickToCopyButton;
-    public GameObject m_morePlayerJoinWarningText;
-    public GameObject m_player1StatusText;
-    public GameObject m_player2StatusText;
-    public GameObject m_player3StatusText;
-    public GameObject m_player4StatusText;
-    public GameObject m_playerNumberText;
 
     public GameObject m_towerUpgradePanel;
     public GameObject m_towerUpgradeTowerAttackPowerButton;
@@ -83,4 +74,13 @@ public class UIElementReference : Singleton<UIElementReference>
     public GameObject m_loseGamePanel;
     public GameObject m_restartButton;
     public GameObject m_loseGameButton;
+
+    public GameObject m_player1Sheild;
+    public GameObject m_player2Sheild;
+    public GameObject m_player3Sheild;
+    public GameObject m_player4Sheild;
+
+    public GameObject m_resetButtonText;
+
+    public GameObject m_bloodScreen;
 }

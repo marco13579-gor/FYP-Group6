@@ -28,7 +28,11 @@ public enum TowerType
     Lucifer,
     GoldMine,
     BountryTower,
-    RedCrimson
+    RedCrimson,
+    Obelisk,
+    AncientRelics,
+    Chronos,
+    TheDespair
 }
 
 public enum GameState 

@@ -13,4 +13,8 @@ public class EnemySO : ScriptableObject
     public int m_attackPower = 5;
     public float m_movementSpeed = 5;
     public int m_rewardGold = 1;
+    public bool m_isSlowResistance;
+    public bool m_isStunResistance;
+    public bool m_isFireResistance;
+    public bool m_isExecuteResistance;
 }

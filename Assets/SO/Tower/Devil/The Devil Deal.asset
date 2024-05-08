@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_name: The Devil Deal
   m_towerType: 16
-  m_attackPower: 20
+  m_attackPower: 69
   m_attackSpeed: 2
-  m_attackRange: 3
-  m_cost: 32
+  m_attackRange: 8
+  m_isAreaAttack: 0
+  m_cost: 66
   m_tileToBuild: 
   m_offset: {x: 0.25, y: 0, z: 0.25}
   m_sprite: {fileID: 21300000, guid: 5ab1e3a88b4c63249aeafd0624f86dc1, type: 3}
-  m_desritption: ' 6, it will turn 6 gold into 1 hp.eal. In repose state, If your
-    gold is greater than 6, it will turn 6 gold into 1 hp.'
+  m_desritption: In repose state, If your gold is greater than 6, it will turn 6
+    gold into 1 hp.

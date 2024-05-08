@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 267e6ef6dd85ca442a30def7e2197eaf, type: 3}
   m_Name: Wave11
   m_EditorClassIdentifier: 
-  m_enemiesCount: 0a000000140000000f000000
+  m_enemiesCount: 0f000000140000000f000000
   m_enemiesType:
-  - {fileID: 4531109324556924230, guid: 6d6d320a8e9324649ac24ccc3a8d3bcf, type: 3}
+  - {fileID: 4257344395038504017, guid: 3ad722d1637bf5247b139a1003eeccf2, type: 3}
   - {fileID: 872553799917560068, guid: dc834ed1ec0f29348b30d67aad836f1a, type: 3}
   - {fileID: 3998262735812314555, guid: d58dc7ba6c7ec2344a68b6f35d03ea9c, type: 3}

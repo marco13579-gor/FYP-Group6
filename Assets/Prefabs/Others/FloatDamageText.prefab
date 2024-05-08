@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2133419728}
   - component: {fileID: -7196371454678483844}
   m_Layer: 0
-  m_Name: FloatText
+  m_Name: FloatDamageText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -91,7 +91,7 @@ TextMesh:
   m_Anchor: 1
   m_Alignment: 1
   m_TabSize: 4
-  m_FontSize: 0
+  m_FontSize: 18
   m_FontStyle: 0
   m_RichText: 1
   m_Font: {fileID: 12800000, guid: e652b43a8e3548141951922ac1495b2d, type: 3}

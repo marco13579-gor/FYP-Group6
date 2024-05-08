@@ -132,4 +132,23 @@ public class CameraManager : NetworkBehaviour
         float zoomSpeed = 20f;
         cinemachineVirtual.m_Lens.FieldOfView = targetFieldOfView = Mathf.Lerp(cinemachineVirtual.m_Lens.FieldOfView, targetFieldOfView, Time.deltaTime * zoomSpeed);
     }
+
+    public void OnSwitchCameraView(int playerId)
+    {
+        switch (playerId)
+        {
+            case 0:
+                transform.position = new Vector3(-22, 3, -3);
+                break;
+            case 1:
+                transform.position = new Vector3(34, 3, -3);
+                break;
+            case 2:
+                transform.position = new Vector3(-25, 3, -54);
+                break;
+            case 3:
+                transform.position = new Vector3(34, 3, -54);
+                break;
+        }
+    }
 }

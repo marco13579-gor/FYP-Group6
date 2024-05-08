@@ -25,6 +25,8 @@ public class GameEventReference : Singleton<GameEventReference>
     public GameEvent OnExecuteStunnedEnemy = new GameEvent();
     public GameEvent OnExecuteEnemy = new GameEvent();
 
+    public GameEvent OnRuptureEnemy = new GameEvent();
+
     public GameEvent OnEnemySlowed = new GameEvent();
     public GameEvent OnEnemyStunned = new GameEvent();
 

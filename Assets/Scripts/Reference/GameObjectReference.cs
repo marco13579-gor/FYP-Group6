@@ -16,4 +16,9 @@ public class GameObjectReference : Singleton<GameObjectReference>
     public GameObject cameraFocusPoint;
 
     public AudioSource m_audioSource;
+
+    public GameObject m_map1Object;
+    public GameObject m_map2Object;
+    public GameObject m_map3Object;
+    public GameObject m_map4Object;
 }

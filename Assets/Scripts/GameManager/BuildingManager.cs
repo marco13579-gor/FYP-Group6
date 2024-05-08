@@ -1,6 +1,6 @@
 using System;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 public class BuildingManager : NetworkedSingleton<BuildingManager>
 {
@@ -222,6 +222,15 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
                 break;
             case TowerType.RedCrimson:
                 tower = TowerPrefabsReference.Instance.m_redCrimson.GetComponent<Tower>();
+                break;
+            case TowerType.AncientRelics:
+                tower = TowerPrefabsReference.Instance.m_ancientRlics.GetComponent<Tower>();
+                break;
+            case TowerType.Obelisk:
+                tower = TowerPrefabsReference.Instance.m_obelisk.GetComponent<Tower>();
+                break;
+            case TowerType.Chronos:
+                tower = TowerPrefabsReference.Instance.m_chronos.GetComponent<Tower>();
                 break;
             default:
                 tower = null;

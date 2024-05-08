@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 267e6ef6dd85ca442a30def7e2197eaf, type: 3}
   m_Name: Wave10 (Boss Wave)
   m_EditorClassIdentifier: 
-  m_enemiesCount: 0500000005000000050000000500000001000000
+  m_enemiesCount: 0500000005000000030000000a00000001000000
   m_enemiesType:
   - {fileID: 5288182235962794477, guid: be72d227d27c9d04797f0104a3aa2290, type: 3}
   - {fileID: 4257344395038504017, guid: 3ad722d1637bf5247b139a1003eeccf2, type: 3}

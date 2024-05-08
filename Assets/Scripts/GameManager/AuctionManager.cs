@@ -30,8 +30,32 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
 
         if (m_isAuctionStateFirstTrigger)
         {
+            EndAuctionState(0);
+
             m_playerGiveUpList = new bool[NetworkManager.Singleton.ConnectedClients.Count];
             m_isAuctionStateFirstTrigger = false;
+
+            switch (GameNetworkManager.Instance.GetPlayerNumber())
+            {
+                case 1:
+                    UIElementReference.Instance.m_player1GoldText.SetActive(true);
+                    UIElementReference.Instance.m_player2GoldText.SetActive(false);
+                    UIElementReference.Instance.m_player3GoldText.SetActive(false);
+                    UIElementReference.Instance.m_player4GoldText.SetActive(false);
+                    break;
+                case 2:
+                    UIElementReference.Instance.m_player1GoldText.SetActive(true);
+                    UIElementReference.Instance.m_player2GoldText.SetActive(true);
+                    UIElementReference.Instance.m_player3GoldText.SetActive(false);
+                    UIElementReference.Instance.m_player4GoldText.SetActive(false);
+                    break;
+                case 3:
+                    UIElementReference.Instance.m_player1GoldText.SetActive(true);
+                    UIElementReference.Instance.m_player2GoldText.SetActive(true);
+                    UIElementReference.Instance.m_player3GoldText.SetActive(true);
+                    UIElementReference.Instance.m_player4GoldText.SetActive(false);
+                    break;
+            }
         }
 
         if (m_isTurnChangeTrigger)

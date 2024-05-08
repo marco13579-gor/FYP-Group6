@@ -15,6 +15,10 @@ MonoBehaviour:
   m_name: Testing Enemy
   m_maxHealth: 25
   m_health: 25
-  m_attackPower: 3
+  m_attackPower: 1
   m_movementSpeed: 1.4
-  m_rewardGold: 3
+  m_rewardGold: 1
+  m_isSlowResistance: 0
+  m_isStunResistance: 0
+  m_isFireResistance: 0
+  m_isExecuteResistance: 0

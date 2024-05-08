@@ -26,4 +26,7 @@ public class TowerPrefabsReference : Singleton<TowerPrefabsReference>
     public GameObject m_bountryTower;
     public GameObject m_goldMiner;
     public GameObject m_redCrimson;
+    public GameObject m_obelisk;
+    public GameObject m_ancientRlics;
+    public GameObject m_chronos;
 }

@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_name: Red Crimson
   m_towerType: 20
-  m_attackPower: 70
+  m_attackPower: 50
   m_attackSpeed: 2
   m_attackRange: 6
-  m_cost: 30
+  m_isAreaAttack: 1
+  m_cost: 50
   m_tileToBuild: 010000000200000004000000
   m_offset: {x: 1, y: 0, z: 1}
   m_sprite: {fileID: 21300000, guid: 6f2929476f7a3804c9d0c92c2fdf0d19, type: 3}
   m_desritption: This tower will deal extra damage according to the amount of the
-    ignite on that target. Every ignite will increase 30% damage to that target.
+    ignite on that target. Every ignite will increase 100% damage to that target.

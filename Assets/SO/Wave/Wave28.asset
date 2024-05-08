@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 267e6ef6dd85ca442a30def7e2197eaf, type: 3}
+  m_Name: Wave28
+  m_EditorClassIdentifier: 
+  m_enemiesCount: 14000000140000000a00000005000000
+  m_enemiesType:
+  - {fileID: 1820142580768629400, guid: d28dbc8200f2bff46822aa4d767b5f0b, type: 3}
+  - {fileID: 3580773116083784143, guid: 420bdd3c649d37b4880338e402110318, type: 3}
+  - {fileID: 8564501806596414411, guid: 22e300a5c42a84a43841e41401e43051, type: 3}
+  - {fileID: 1576940091983294479, guid: af6b44e5eae0ffb4f90978de10d16f35, type: 3}

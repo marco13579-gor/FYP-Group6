@@ -19,6 +19,8 @@ public class TowerTargeting : NetworkBehaviour
     {
         GameEventReference.Instance.OnTowerPlaced.AddListener(OnTowerPlaced);
         GameEventReference.Instance.OnEnemyDestroyed.AddListener(OnEnemyDestroyed);
+
+        GameEventReference.Instance.OnEnterReposeState.AddListener(OnEnterReposeState);
     }
 
     private void Update()
@@ -31,6 +33,8 @@ public class TowerTargeting : NetworkBehaviour
         if (!IsServer)
             return;
 
+        m_availableTargets.RemoveAll(currentObj => currentObj == null);
+
         if (m_availableTargets.Count == 0)
         {
             m_targetEnemy = null;
@@ -38,17 +42,17 @@ public class TowerTargeting : NetworkBehaviour
         }
         else
         {
-            if (m_availableTargets[0] == null) return; 
 
             switch (m_towerTargetSelectCondition)
             {
                 case TowerTargetsSelectCondition.FirstTarget:
-                    if (m_targetEnemy == null && !m_availableTargets[0].GetComponent<Enemy>().Equals(m_targetEnemy))
+                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null && !m_availableTargets[0].GetComponent<Enemy>().Equals(m_targetEnemy))
                     {
-                        if(m_availableTargets[0].GetComponent<Enemy>() != null)
+                        if (m_availableTargets[0].GetComponent<Enemy>() != null && !m_availableTargets[0].GetComponent<Enemy>().GetDieStatus())
                         {
                             m_targetEnemy = m_availableTargets[0].GetComponent<Enemy>();
                             GameEventReference.Instance.OnTowerChangeTarget.Trigger(m_tower.GetTowerID(), m_targetEnemy);
+                            m_tower.SetTargetEnemyList(m_availableTargets);
                         }
                     }
                     else
@@ -58,12 +62,13 @@ public class TowerTargeting : NetworkBehaviour
                     }
                     break;
                 case TowerTargetsSelectCondition.LastTarget:
-                    if (m_targetEnemy == null && !m_availableTargets[m_availableTargets.Count - 1].GetComponent<Enemy>().Equals(m_targetEnemy))
+                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null && !m_availableTargets[m_availableTargets.Count - 1].GetComponent<Enemy>().Equals(m_targetEnemy))
                     {
                         if (m_availableTargets[0].GetComponent<Enemy>() != null)
                         {
                             m_targetEnemy = m_availableTargets[m_availableTargets.Count - 1].GetComponent<Enemy>();
                             GameEventReference.Instance.OnTowerChangeTarget.Trigger(m_tower.GetTowerID(), m_targetEnemy);
+                            m_tower.SetTargetEnemyList(m_availableTargets);
                         }
                     }
                     else
@@ -84,12 +89,13 @@ public class TowerTargeting : NetworkBehaviour
                             maxHealthPointEnemyIndex = i;
                         }
                     }
-                    if (m_targetEnemy == null && !m_availableTargets[maxHealthPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
+                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null && !m_availableTargets[maxHealthPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
                     {
-                        if(m_availableTargets[maxHealthPointEnemyIndex].GetComponent<Enemy>() != null)
+                        if (m_availableTargets[maxHealthPointEnemyIndex].GetComponent<Enemy>() != null)
                         {
                             m_targetEnemy = m_availableTargets[maxHealthPointEnemyIndex].GetComponent<Enemy>();
                             GameEventReference.Instance.OnTowerChangeTarget.Trigger(m_tower.GetTowerID(), m_targetEnemy);
+                            m_tower.SetTargetEnemyList(m_availableTargets);
                         }
                     }
                     else
@@ -110,12 +116,13 @@ public class TowerTargeting : NetworkBehaviour
                             minSpeedPointEnemyIndex = i;
                         }
                     }
-                    if (m_targetEnemy == null && !m_availableTargets[minSpeedPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
+                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null && !m_availableTargets[minSpeedPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
                     {
-                        if(m_availableTargets[minSpeedPointEnemyIndex].GetComponent<Enemy>() != null)
+                        if (m_availableTargets[minSpeedPointEnemyIndex].GetComponent<Enemy>() != null)
                         {
                             m_targetEnemy = m_availableTargets[minSpeedPointEnemyIndex].GetComponent<Enemy>();
                             GameEventReference.Instance.OnTowerChangeTarget.Trigger(m_tower.GetTowerID(), m_targetEnemy);
+                            m_tower.SetTargetEnemyList(m_availableTargets);
                         }
                     }
                     else
@@ -136,12 +143,13 @@ public class TowerTargeting : NetworkBehaviour
                             maxSpeedPointEnemyIndex = i;
                         }
                     }
-                    if (m_targetEnemy == null && !m_availableTargets[maxSpeedPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
+                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null && !m_availableTargets[maxSpeedPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
                     {
-                        if(m_availableTargets[maxSpeedPointEnemyIndex].GetComponent<Enemy>() != null)
+                        if (m_availableTargets[maxSpeedPointEnemyIndex].GetComponent<Enemy>() != null)
                         {
                             m_targetEnemy = m_availableTargets[maxSpeedPointEnemyIndex].GetComponent<Enemy>();
                             GameEventReference.Instance.OnTowerChangeTarget.Trigger(m_tower.GetTowerID(), m_targetEnemy);
+                            m_tower.SetTargetEnemyList(m_availableTargets);
                         }
                     }
                     else
@@ -162,12 +170,13 @@ public class TowerTargeting : NetworkBehaviour
                             minHealthPointEnemyIndex = i;
                         }
                     }
-                    if (m_targetEnemy == null && !m_availableTargets[minHealthPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
+                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null &&!m_availableTargets[minHealthPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
                     {
-                        if(m_availableTargets[minHealthPointEnemyIndex] != null)
+                        if (m_availableTargets[minHealthPointEnemyIndex] != null)
                         {
                             m_targetEnemy = m_availableTargets[minHealthPointEnemyIndex].GetComponent<Enemy>();
                             GameEventReference.Instance.OnTowerChangeTarget.Trigger(m_tower.GetTowerID(), m_targetEnemy);
+                            m_tower.SetTargetEnemyList(m_availableTargets);
                         }
                     }
                     else
@@ -201,7 +210,14 @@ public class TowerTargeting : NetworkBehaviour
         if (m_availableTargets.Contains(enemy))
         {
             m_availableTargets.Remove(enemy);
+            m_tower.RemoveTarget();
+            m_tower.SetTargetEnemyList(m_availableTargets);
         }
+    }
+
+    private void OnEnterReposeState(params object[] param)
+    {
+        
     }
 
     private void OnTriggerEnter(Collider other)
@@ -222,9 +238,10 @@ public class TowerTargeting : NetworkBehaviour
         {
             m_availableTargets.Remove(target);
 
-            if(target == m_targetEnemy)
+            if (target == m_targetEnemy)
             {
                 m_targetEnemy = null;
+                m_tower.RemoveTarget();
             }
         }
     }

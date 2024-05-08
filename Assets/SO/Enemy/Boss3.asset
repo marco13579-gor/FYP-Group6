@@ -17,4 +17,8 @@ MonoBehaviour:
   m_health: 100000
   m_attackPower: 50
   m_movementSpeed: 1
-  m_rewardGold: 422
+  m_rewardGold: 0
+  m_isSlowResistance: 0
+  m_isStunResistance: 0
+  m_isFireResistance: 0
+  m_isExecuteResistance: 1

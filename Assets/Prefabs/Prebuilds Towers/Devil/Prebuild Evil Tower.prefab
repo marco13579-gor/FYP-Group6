@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2186245c121474a95a1461c3dff319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_toBuildTower: {fileID: -8257067318518426475, guid: b0e9d724cf8a8da43a0e68a45126e03e, type: 3}
+  m_toBuildTower: {fileID: 7526399471569292418, guid: b0e9d724cf8a8da43a0e68a45126e03e, type: 3}
   m_rangeIndiactor: {fileID: 3154810890427911563}
   m_towerSO: {fileID: 11400000, guid: 468ce96d3b868434192f6874e0a49dc8, type: 2}
 --- !u!1001 &4128277662775999239

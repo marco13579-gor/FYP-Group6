@@ -28,6 +28,26 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
         GameEventReference.Instance.OnAuctionEnd.AddListener(OnAuctionEnd);
     }
 
+    public void RequestToRefreshCardSlot()
+    {
+        if (PlayerStatsManager.Instance.GetLoseStatus()) return;
+
+        int requiredGold = GameStateManager.Instance.GetGameTurn() * 5;
+        if (requiredGold == 0) requiredGold = 5;
+
+        if (PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) >= requiredGold)
+        {
+            int newGoldAmount = PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - requiredGold;
+            //GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
+
+            RefreshCardSlot(0);
+            RefreshCardSlot(1);
+            RefreshCardSlot(2);
+            RefreshCardSlot(3);
+            RefreshCardSlot(4);
+        }
+    }
+
     private void RefreshCardSlot(int slotIndex)
     {
         if (PlayerStatsManager.Instance.GetLoseStatus()) return;
@@ -94,12 +114,20 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
 
     public void UpdataCardSlotVisual(int slotIndex, PrebuildTower towerToBuild)
     {
+        //Preset the area attack image is false
+        m_cardSlots[slotIndex].transform.GetChild(8).gameObject.SetActive(false);
+
         m_cardSlots[slotIndex].transform.GetChild(0).GetComponent<Image>().sprite = towerToBuild.m_towerSO.m_sprite;
         m_cardSlots[slotIndex].transform.GetChild(2).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_name;
         m_cardSlots[slotIndex].transform.GetChild(3).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_desritption;
         m_cardSlots[slotIndex].transform.GetChild(5).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_cost.ToString();
         m_cardSlots[slotIndex].transform.GetChild(6).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_attackPower.ToString();
         m_cardSlots[slotIndex].transform.GetChild(7).GetComponent<TMP_Text>().text = towerToBuild.m_towerSO.m_attackRange.ToString();
+
+        if (towerToBuild.m_towerSO.m_isAreaAttack)
+        {
+            m_cardSlots[slotIndex].transform.GetChild(8).gameObject.SetActive(true);
+        }
     }
 
     private void RemoveCardSlotContent(int cardSlotToRemove)
@@ -119,7 +147,7 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
         {
             cardDrawState = CardDrawState.EarlyGame;
         }
-        else if (turnValue <= 12)
+        else if (turnValue <= 15)
         {
             cardDrawState = CardDrawState.MidGame;
         }
@@ -132,13 +160,13 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
         switch (cardDrawState)
         {
             case CardDrawState.EarlyGame:
-                drawValue = 15;
+                drawValue = 20;
                 break;
             case CardDrawState.MidGame:
-                drawValue = 25; 
+                drawValue = 50; 
                 break;
             case CardDrawState.LateGame:
-                drawValue = 40; 
+                drawValue = 100;
                 break;
         }
 

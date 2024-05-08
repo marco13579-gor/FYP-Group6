@@ -56,6 +56,8 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
         GameEventReference.Instance.OnExecuteStunnedEnemy.AddListener(OnExecuteStunnedEnemy);
         GameEventReference.Instance.OnExecuteEnemy.AddListener(OnExecuteEnemy);
 
+        GameEventReference.Instance.OnRuptureEnemy.AddListener(OnRuptureEnemy);
+
         GameEventReference.Instance.OnEnemySlowed.AddListener(OnEnemySlowed);
         GameEventReference.Instance.OnEnemyStunned.AddListener(OnEnemyStunned);
     }
@@ -83,12 +85,17 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
         int TowerID = (int)param[2];
         int triggerCount = (int)param[3];
 
+
+        if (m_SpawnedEnemies.ContainsKey(enemyID))
+        {
+            if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetFireResistance()) return;
+        }
+
         if (m_SpawnedEnemies.ContainsKey(enemyID))
         {
             if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().ContainsKey(TowerID))
             {
                 print("Ignite tower same");
-                return;
             }
         }
 
@@ -492,7 +499,7 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
             if (!m_SpawnedEnemies.ContainsKey(enemyID))
                 return;
 
-            if (isIgnited && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+            if (isIgnited && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute) && !m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetExecuteResistance())
             {
                 m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
             }
@@ -518,7 +525,7 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
             if (!m_SpawnedEnemies.ContainsKey(enemyID))
                 return;
 
-            if (isSlowed && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+            if (isSlowed && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute) && !m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetExecuteResistance())
             {
                 m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
             }
@@ -544,7 +551,7 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
             if (!m_SpawnedEnemies.ContainsKey(enemyID))
                 return;
 
-            if (isStunned && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+            if (isStunned && (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute) && !m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetExecuteResistance())
             {
                 m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
             }
@@ -561,12 +568,22 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
         if (!m_SpawnedEnemies.ContainsKey(enemyID))
             return;
 
-        if ((m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute))
+        if ((m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth() / m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyMaxHealth() <= scaleHpToExecute) && !m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetExecuteResistance())
         {
             m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Executed();
             m_SpawnedEnemies[enemyID].GetComponent<Enemy>().Hurt(m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyHealth());
         }
 
+    }
+
+    private void OnRuptureEnemy(params object[] param)
+    {
+        int enemyID = (int)param[0];
+        float ruturedRate = (float)param[1];
+
+        if (!m_SpawnedEnemies.ContainsKey(enemyID))
+            return;
+        m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyIsRupture(ruturedRate);
     }
 
     private void OnEnemyHurt(params object[] param)

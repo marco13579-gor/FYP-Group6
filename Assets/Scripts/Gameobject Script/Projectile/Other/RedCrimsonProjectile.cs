@@ -5,7 +5,7 @@ using UnityEngine;
 public class RedCrimsonProjectile : Projectile
 {
     [SerializeField]
-    private float m_scare = 1.25f;
+    private float m_scare = 1.75f;
     protected override void OnHitTarget()
     {
         GameEventReference.Instance.OnDealScaredDamageOnIgnitedAmountTarget.Trigger(m_enemyToShoot.GetEnemyID(), m_attackPower, m_scare);

@@ -40,7 +40,7 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     [ClientRpc]
     private void LoseTriggerClientRpc(int id)
     {
-        if(GameNetworkManager.Instance.GetPlayerID() == id)
+        if (GameNetworkManager.Instance.GetPlayerID() == id)
         {
             print("Loseeeee");
         }
@@ -68,13 +68,13 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     [ClientRpc]
     private void UpdatePlayerHealthModifyClientRpc(int newHealthAmount, int modifierID)
     {
-        if(m_isLosed) { return; }
-        if(m_playersHealthList[modifierID] > 0)
+        if (m_isLosed) { return; }
+        if (m_playersHealthList[modifierID] > 0)
             m_playersHealthList[modifierID] = newHealthAmount;
 
-        if(GameNetworkManager.Instance.GetPlayerID() == modifierID)
+        if (GameNetworkManager.Instance.GetPlayerID() == modifierID)
         {
-            if(m_playersHealthList[modifierID] <= 0)
+            if (m_playersHealthList[modifierID] <= 0)
             {
                 m_isLosed = true;
                 UIElementReference.Instance.m_loseGamePanel.SetActive(true);
@@ -82,7 +82,7 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
                 {
                     UIElementReference.Instance.m_loseGamePanel.SetActive(false);
                 });
-                
+
                 UpdataServerPlayerLosedAmountServerRpc();
             }
         }
@@ -93,9 +93,9 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     {
         m_playerLosedAmount++;
 
-        if(m_playerLosedAmount >= GameNetworkManager.Instance.GetPlayerNumber() - 1)
+        if (m_playerLosedAmount >= GameNetworkManager.Instance.GetPlayerNumber() - 1)
         {
-            for(int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
+            for (int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
             {
                 if (m_playersHealthList[i] > 0)
                 {
@@ -120,11 +120,25 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
         }
         UIElementReference.Instance.m_restartGameButton.GetComponent<Button>().onClick.AddListener(delegate
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Disconnect();
+            Cleanup();
+            SceneManager.LoadScene("GameScene", LoadSceneMode.Single);
         });
         Time.timeScale = 0;
     }
 
+    private void Disconnect()
+    {
+        NetworkManager.Singleton.Shutdown();
+    }
+
+    private void Cleanup()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            Destroy(NetworkManager.Singleton.gameObject);
+        }
+    }
     private void OnPlayerModifyGold(params object[] param)
     {
         int newGoldAmount = (int)param[0];
