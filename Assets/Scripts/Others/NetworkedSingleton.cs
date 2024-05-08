@@ -20,6 +20,12 @@ public class NetworkedSingleton<T> : NetworkBehaviour where T : Component
         }
     }
 
+    protected void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     protected virtual void Init()
     {
     }

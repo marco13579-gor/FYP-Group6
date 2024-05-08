@@ -15,6 +15,8 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     private NetworkVariable<int> m_losedAmount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private void Start()
     {
+        Time.timeScale = 1f;
+
         for (int i = 0; i < m_playersHealthList.Length; i++)
         {
             m_playersHealthList[i] = m_playerHealthAmount;

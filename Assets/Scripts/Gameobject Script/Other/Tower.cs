@@ -1,15 +1,7 @@
-using JetBrains.Annotations;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using UnityEngine;
 using Unity.Mathematics;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.UIElements;
-using static Cinemachine.CinemachineTargetGroup;
-using static UnityEngine.GraphicsBuffer;
-
 
 public abstract class Tower : NetworkBehaviour
 {

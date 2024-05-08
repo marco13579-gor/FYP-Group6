@@ -16,7 +16,7 @@ MonoBehaviour:
   m_maxHealth: 10
   m_health: 10
   m_attackPower: 40
-  m_movementSpeed: 20
+  m_movementSpeed: 2
   m_rewardGold: 1
   m_isSlowResistance: 0
   m_isStunResistance: 0
