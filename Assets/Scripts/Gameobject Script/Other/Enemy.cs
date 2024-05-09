@@ -94,6 +94,11 @@ public class Enemy : NetworkBehaviour
             this.GetComponent<NetworkObject>().Despawn();
         }
 
+        if (PlayerStatsManager.Instance.m_playersHealthList[m_playerMapID.Value] <= 0 && !isDieLogicTrigger)
+        {
+            Hurt(m_health.Value);
+        }
+
         DieLogic();
         if (isDie) return;
         ReduceMovementSpeedLogic();
@@ -179,7 +184,7 @@ public class Enemy : NetworkBehaviour
             int newHealthAmount = PlayerStatsManager.Instance.GetPlayerHealth(this.GetPlayMap()) - (int)this.m_attackPower.Value;
             GameEventReference.Instance.OnPlayerModifyHealth.Trigger(newHealthAmount, this.GetPlayMap());
 
-            EnemySelectManager.Instance.TriggerEnemyDeath(this.gameObject);
+            TriggerEnemyDeathClientRpc();
             EnemyManager.Instance.Unregister(this.gameObject);
             GetComponent<NetworkObject>().Despawn();
             return;
@@ -213,10 +218,16 @@ public class Enemy : NetworkBehaviour
                 this.m_movementSpeed.Value = 0;
                 GetComponent<NetworkAnimator>().SetTrigger("die");
                 GetComponent<DissolveController>().TriggerDie();
-                EnemySelectManager.Instance.TriggerEnemyDeath(this.gameObject);
+                TriggerEnemyDeathClientRpc();
                 EnemyDieSoundTriggerClientRpc();
             }
         }
+    }
+
+    [ClientRpc]
+    private void TriggerEnemyDeathClientRpc()
+    {
+        EnemySelectManager.Instance.TriggerEnemyDeath(this.gameObject);
     }
 
     public void Executed()

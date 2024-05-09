@@ -22,5 +22,5 @@ MonoBehaviour:
   m_tileToBuild: 
   m_offset: {x: 0.25, y: 0, z: 0.25}
   m_sprite: {fileID: 21300000, guid: 262ec8c2a7bb4384ab5e19763867652d, type: 3}
-  m_desritption: If the target is not slowed, it will appied slow to that target.
-    If it is slowed, it deals 50% to that target.
+  m_desritption: If the target is not slowed, it will appied slow to that target
+    60% 2s. If it is slowed, it deals 50% to that target.

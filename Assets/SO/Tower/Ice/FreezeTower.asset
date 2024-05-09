@@ -22,4 +22,4 @@ MonoBehaviour:
   m_tileToBuild: 010000000200000004000000
   m_offset: {x: 1, y: 0, z: 1}
   m_sprite: {fileID: 21300000, guid: fbd2d8d2379b1dd4cb177904eabf3e82, type: 3}
-  m_desritption: Slow target 30% for 5 seconds
+  m_desritption: Slow target 30% for 1 seconds

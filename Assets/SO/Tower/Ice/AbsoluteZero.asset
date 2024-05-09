@@ -18,9 +18,10 @@ MonoBehaviour:
   m_attackSpeed: 10
   m_attackRange: 18
   m_isAreaAttack: 1
-  m_cost: 20
+  m_cost: 300
   m_tileToBuild: 0000000001000000020000000300000004000000050000000600000007000000
   m_offset: {x: 0.25, y: 0, z: 0}
   m_sprite: {fileID: 21300000, guid: 8698fc0b656d5f647a9766d4a6e145f4, type: 3}
-  m_desritption: All the creature feel gold when the tower is build. All the mob
-    will be slow by 99% for 3s.
+  m_desritption: All the creature feel gold when the tower is build. It will execution
+    all the slowed mobs and health below 30%. After that, all the mob will be slow
+    by 99% for 3s.

@@ -8,8 +8,6 @@ using UnityEngine.UI;
 
 public class UIManager : NetworkBehaviour
 {
-    [SerializeField]
-    private GameObject[] m_shieldList;
 
     private bool m_papartionTimerCountDownTriggered = true;
     private bool m_reposeTimerCountDownTriggered = true;
@@ -35,13 +33,7 @@ public class UIManager : NetworkBehaviour
         if (refreshGold == 0) refreshGold = 5;
         UIElementReference.Instance.m_resetButtonText.GetComponent<TMP_Text>().text = $"${refreshGold}";
 
-        for(int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
-        {
-            if(GameNetworkManager.Instance.GetPlayerID() == i)
-            {
-                m_shieldList[i].SetActive(true);
-            }
-        }
+
 
         if (NetworkManager.Singleton.IsClient && !m_papartionTimerCountDownTriggered)
         {

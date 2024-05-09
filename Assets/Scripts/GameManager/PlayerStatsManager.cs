@@ -70,6 +70,8 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     [ClientRpc]
     private void UpdatePlayerHealthModifyClientRpc(int newHealthAmount, int modifierID)
     {
+        if(m_isLosed) { return; }
+
         if (m_playersHealthList[modifierID] > 0)
             m_playersHealthList[modifierID] = newHealthAmount;
 
@@ -78,8 +80,9 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
             if (m_playersHealthList[modifierID] <= 0)
             {
                 m_isLosed = true;
-                if(m_playerLosedAmount < GameNetworkManager.Instance.GetPlayerNumber() - 1)
+                if (m_playerLosedAmount < GameNetworkManager.Instance.GetPlayerNumber() - 1)
                 {
+                    LoseGameClientRpc();
                     UpdataServerPlayerLosedAmountServerRpc();
                 }
             }
@@ -93,29 +96,34 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
 
         if (m_playerLosedAmount >= GameNetworkManager.Instance.GetPlayerNumber() - 1)
         {
+            int winPlayerIndex = 0;
             for (int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
             {
                 if (m_playersHealthList[i] > 0)
                 {
-                    int winPlayerIndex = i;
-                    EndGameTriggerClientRpc(winPlayerIndex);
+                    winPlayerIndex = i;
                 }
+                EndGameTriggerClientRpc(winPlayerIndex);
             }
         }
-        else
+    }
+
+    [ClientRpc]
+    private void LoseGameClientRpc()
+    {
+        UIElementReference.Instance.m_loseGamePanel.SetActive(true);
+        UIElementReference.Instance.m_restartButton.GetComponent<Button>().onClick.AddListener(delegate
         {
-            UIElementReference.Instance.m_loseGamePanel.SetActive(true);
-            UIElementReference.Instance.m_restartButton.GetComponent<Button>().onClick.AddListener(delegate
-            {
-                UIElementReference.Instance.m_loseGamePanel.SetActive(false);
-            });
-        }
+            UIElementReference.Instance.m_loseGamePanel.SetActive(false);
+        });
     }
 
     [ClientRpc]
     private void EndGameTriggerClientRpc(int id)
     {
         UIElementReference.Instance.m_EndGamePanel.SetActive(true);
+        EnemySelectManager.Instance.ForceClosePanel();
+
         if (GameNetworkManager.Instance.GetPlayerID() == id)
         {
             UIElementReference.Instance.m_victoryGame.SetActive(true);

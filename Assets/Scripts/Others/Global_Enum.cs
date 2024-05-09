@@ -33,7 +33,10 @@ public enum TowerType
     AncientRelics,
     Chronos,
     TheDespair,
-    AbsoluteZero
+    AbsoluteZero,
+    hellFire,
+    grandNature,
+    soulEater
 }
 
 public enum GameState 

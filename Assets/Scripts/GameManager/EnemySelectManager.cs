@@ -63,6 +63,10 @@ public class EnemySelectManager : Singleton<EnemySelectManager>
             m_enemyStatusUI.SetActive(false);
         }
     }
+    public void ForceClosePanel()
+    {
+        m_enemyStatusUI.SetActive(false);
+    }
     private void CameraFollow()
     {
         if (m_selectedEnemyObj != null && !m_selectedEnemyObj.GetComponent<Enemy>().GetDieStatus())
@@ -76,7 +80,7 @@ public class EnemySelectManager : Singleton<EnemySelectManager>
     {
         EnemySO targetEnemySO = targetEnemyObj.GetComponent<Enemy>().GetEnemySo();
         m_uiEnemyNameObj.GetComponent<TMP_Text>().text = $"{targetEnemySO.m_name}";
-        m_uihealthPowerObj.GetComponent<TMP_Text>().text = $"{targetEnemyObj.GetComponent<Enemy>().GetEnemyHealth()} / {targetEnemySO.m_maxHealth}";
+        m_uihealthPowerObj.GetComponent<TMP_Text>().text = $"{Mathf.Floor(targetEnemyObj.GetComponent<Enemy>().GetEnemyHealth())} / {targetEnemySO.m_maxHealth}";
         m_uiAttackPowerObj.GetComponent<TMP_Text>().text = $"{targetEnemySO.m_attackPower.ToString()}";
         m_uiMovementSpeedObj.GetComponent<TMP_Text>().text = $"{targetEnemySO.m_movementSpeed.ToString()}";
         m_uiRewardGoldObj.GetComponent<TMP_Text>().text = $"{targetEnemySO.m_rewardGold.ToString()}";

@@ -31,4 +31,7 @@ public class TowerPrefabsReference : Singleton<TowerPrefabsReference>
     public GameObject m_chronos;
     public GameObject m_theDespair;
     public GameObject m_absoluteZero;
+    public GameObject m_hellFire;
+    public GameObject m_grandNature;
+    public GameObject m_soulEater;
 }

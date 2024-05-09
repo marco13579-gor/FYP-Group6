@@ -30,6 +30,8 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
 
         if (m_isAuctionStateFirstTrigger)
         {
+            //EndAuctionState(0);
+
             m_playerGiveUpList = new bool[NetworkManager.Singleton.ConnectedClients.Count];
             m_isAuctionStateFirstTrigger = false;
 
@@ -63,7 +65,8 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
                 m_currentPlayerTurn.Value = 0;
             }
 
-            TurnChangeClientRpc(m_currentPlayerTurn.Value, m_currentPlayerTurn.Value, m_highestBid.Value);
+            bool isGiveup = m_playerGiveUpList[m_currentPlayerTurn.Value];
+            TurnChangeClientRpc(m_currentPlayerTurn.Value, m_currentPlayerTurn.Value, m_highestBid.Value, isGiveup);
 
             ++m_currentPlayerTurn.Value;
 
@@ -72,11 +75,11 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
     }
 
     [ClientRpc]
-    private void TurnChangeClientRpc(int playerTurnIndex, int playerTurn, int highestBidAmount)
+    private void TurnChangeClientRpc(int playerTurnIndex, int playerTurn, int highestBidAmount, bool isGiveUped)
     {
         if (playerTurnIndex == GameNetworkManager.Instance.GetPlayerID())
         {
-            if (PlayerStatsManager.Instance.GetLoseStatus())
+            if (PlayerStatsManager.Instance.m_playersHealthList[playerTurnIndex] <= 0 || isGiveUped)
             {
                 OnGiveUpButtonClicked();
                 return;
@@ -175,10 +178,14 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
     [ServerRpc(RequireOwnership = false)]
     private void GiveUpButtonClickedServerRpc(int playerID)
     {
+        float m_playersGaveUpAmount = 0;
         m_playerGiveUpList[playerID] = true;
-        ++m_playersGaveUp;
+        foreach(bool option in m_playerGiveUpList)
+        {
+            if (option) m_playersGaveUpAmount++;
+        }
 
-        if (m_playersGaveUp >= GameNetworkManager.Instance.GetPlayerNumber() - 1)
+        if (m_playersGaveUpAmount >= GameNetworkManager.Instance.GetPlayerNumber() - 1)
         {
             for (int i = 0; i < m_playerGiveUpList.Length; i++)
             {

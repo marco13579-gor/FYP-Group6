@@ -10339,5 +10339,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_speed: 0.25
   m_damageScale: 1.5
-  m_slowScale: 0.4
-  m_slowDuration: 6
+  m_slowScale: 0.6
+  m_slowDuration: 2

@@ -83,4 +83,6 @@ public class UIElementReference : Singleton<UIElementReference>
     public GameObject m_resetButtonText;
 
     public GameObject m_bloodScreen;
+
+    public GameObject m_loseScreen;
 }

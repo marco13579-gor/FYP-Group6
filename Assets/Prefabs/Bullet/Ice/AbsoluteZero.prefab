@@ -10281,9 +10281,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7258936774047215837}
   - component: {fileID: 3412860499490707141}
-  - component: {fileID: 2904004991233643672}
+  - component: {fileID: 5774458953030151245}
   m_Layer: 0
-  m_Name: TempestTowerBullet
+  m_Name: AbsoluteZero
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10325,7 +10325,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &2904004991233643672
+--- !u!114 &5774458953030151245
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10334,10 +10334,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7258936774047215834}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 667db183128c999449daaa2fd0db0c3d, type: 3}
+  m_Script: {fileID: 11500000, guid: ca0f8cd95a2e4a148a7b1efe6aa1e5fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 0.25
-  m_damageScale: 1.5
-  m_slowScale: 0.4
-  m_slowDuration: 6
+  slowScare: 0.1
+  slowDuration: 3
+  m_executedScale: 0.3

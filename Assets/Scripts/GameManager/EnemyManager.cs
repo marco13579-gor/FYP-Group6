@@ -636,7 +636,6 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
     private void Update()
     {
         if (!IsServer) return;
-        if (PlayerStatsManager.Instance.GetLoseStatus()) return;
 
         int m_waveEnemyRemaining = 0;
 
@@ -662,13 +661,10 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
 
         for (int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
         {
-            if (PlayerStatsManager.Instance.m_playersHealthList[i] > 0)
-            {
-                Enemy enemy = Instantiate(m_currentWave.m_enemiesType[enemyTypeIndex]);
-                enemy.SetPlayerMap(i);
+            Enemy enemy = Instantiate(m_currentWave.m_enemiesType[enemyTypeIndex]);
+            enemy.SetPlayerMap(i);
 
-                enemy.GetComponent<NetworkObject>().Spawn();
-            }
+            enemy.GetComponent<NetworkObject>().Spawn();
         }
 
         --m_waveEnemyRemainingList[enemyTypeIndex];

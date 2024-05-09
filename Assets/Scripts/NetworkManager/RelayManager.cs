@@ -38,6 +38,8 @@ public class RelayManager : NetworkBehaviour
     private GameObject m_relayPanel;
 
     private string m_RoomCode;
+    [SerializeField]
+    private GameObject[] m_shieldList;
 
     private IEnumerator Start()
     {
@@ -71,11 +73,11 @@ public class RelayManager : NetworkBehaviour
         if (networkManager == null || (!networkManager.IsServer && !networkManager.IsHost))
             return;
 
-        //if (networkManager.ConnectedClientsList.Count < 2)
-        //{
-        //    m_NotEnoughPlayerText.gameObject.SetActive(true);
-        //    return;
-        //}
+        if (networkManager.ConnectedClientsList.Count < 2)
+        {
+            m_NotEnoughPlayerText.gameObject.SetActive(true);
+            return;
+        }
 
         GameStateManager.Instance.ToggleReadyButtonClick();
         StartGameClientRpc();
@@ -213,7 +215,18 @@ public class RelayManager : NetworkBehaviour
 
     [ClientRpc]
     private void StartGameClientRpc()
-        => UIElementReference.Instance.m_roomPanel.SetActive(false);
+    {
+        UIElementReference.Instance.m_roomPanel.SetActive(false);
+
+        for (int i = 0; i < GameNetworkManager.Instance.GetPlayerNumber(); i++)
+        {
+            if (GameNetworkManager.Instance.GetPlayerID() == i)
+            {
+                m_shieldList[i].SetActive(true);
+            }
+        }
+    }
+
 
     private void OnClientConnected(ulong client)
         => UpdatePlayerStatusClientRpc(NetworkManager.Singleton.ConnectedClients.Count);
