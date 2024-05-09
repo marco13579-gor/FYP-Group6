@@ -329,6 +329,15 @@ public class Enemy : NetworkBehaviour
         go.GetComponent<TextMesh>().text = $"${gold.ToString()}";
     }
 
+    [ClientRpc]
+    private void EnableResistanceSheildClientRpc(bool fire, bool slow, bool stun, bool execute)
+    {
+        if (m_isFireResistance.Value) m_fireResistance.SetActive(fire);
+        if (m_isSlowResistance.Value) m_slowResistance.SetActive(slow);
+        if (m_isStunResistance.Value) m_stunResistance.SetActive(stun);
+        if (m_isExecuteResistance.Value) m_executeResistance.SetActive(execute);
+    }
+
     private void ValueInit()
     {
         m_name.Value = new FixedString512Bytes(m_enemySO.m_name);
@@ -343,10 +352,7 @@ public class Enemy : NetworkBehaviour
         m_isFireResistance.Value = m_enemySO.m_isFireResistance;
         m_isExecuteResistance.Value = m_enemySO.m_isExecuteResistance;
 
-        if (m_isFireResistance.Value) m_fireResistance.SetActive(true);
-        if (m_isSlowResistance.Value) m_slowResistance.SetActive(true);
-        if (m_isStunResistance.Value) m_stunResistance.SetActive(true);
-        if (m_isExecuteResistance.Value) m_executeResistance.SetActive(true);
+        EnableResistanceSheildClientRpc(m_isFireResistance.Value, m_isSlowResistance.Value, m_isStunResistance.Value, m_isExecuteResistance.Value);
 
         //Switch player ID to set spawn on which map
         //m_wayPointList = WaypointReference.Instance.m_wayPoints;
