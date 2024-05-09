@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Boss1
   m_EditorClassIdentifier: 
   m_name: Despair Dark Warrior
-  m_maxHealth: 3000
-  m_health: 3000
+  m_maxHealth: 100
+  m_health: 100
   m_attackPower: 30
   m_movementSpeed: 1.4
   m_rewardGold: 100

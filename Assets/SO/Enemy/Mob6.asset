@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Mob6
   m_EditorClassIdentifier: 
   m_name: Demon Dragon
-  m_maxHealth: 320
-  m_health: 320
+  m_maxHealth: 300
+  m_health: 300
   m_attackPower: 5
   m_movementSpeed: 3
   m_rewardGold: 5
