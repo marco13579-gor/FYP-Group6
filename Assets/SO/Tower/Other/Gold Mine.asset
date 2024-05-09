@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7cf844c0f87f09419ad13ded15778cb, type: 3}
   m_Name: Gold Mine
   m_EditorClassIdentifier: 
-  m_name: Gold Mine
+  m_name: CrystalMine
   m_towerType: 18
   m_attackPower: 10
   m_attackSpeed: 0

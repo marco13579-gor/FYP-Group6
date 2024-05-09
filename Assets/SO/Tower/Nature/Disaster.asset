@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_name: Disaster
   m_towerType: 11
-  m_attackPower: 20
+  m_attackPower: 5
   m_attackSpeed: 2
   m_attackRange: 5
-  m_isAreaAttack: 0
+  m_isAreaAttack: 1
   m_cost: 15
   m_tileToBuild: 010000000200000004000000
   m_offset: {x: 1, y: 0, z: 1}

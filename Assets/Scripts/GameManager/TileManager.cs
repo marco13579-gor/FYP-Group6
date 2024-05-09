@@ -52,6 +52,12 @@ public class TileManager : NetworkedSingleton<TileManager>
             GameObject tileToRemovePlaced = m_tiles[tilesIDList[i]];
             tileToRemovePlaced.GetComponent<Tiles>().m_isPlaced = false;
         }
+        RemoveTilesPlacedServerRpc(tilesIDList);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RemoveTilesPlacedServerRpc(int[] tilesIDList)
+    {
         RemoveTilesPlacedClientRpc(tilesIDList);
     }
 

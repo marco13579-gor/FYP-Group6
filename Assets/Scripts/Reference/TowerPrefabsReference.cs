@@ -29,4 +29,6 @@ public class TowerPrefabsReference : Singleton<TowerPrefabsReference>
     public GameObject m_obelisk;
     public GameObject m_ancientRlics;
     public GameObject m_chronos;
+    public GameObject m_theDespair;
+    public GameObject m_absoluteZero;
 }

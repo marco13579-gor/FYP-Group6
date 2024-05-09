@@ -30,8 +30,6 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
 
         if (m_isAuctionStateFirstTrigger)
         {
-            EndAuctionState(0);
-
             m_playerGiveUpList = new bool[NetworkManager.Singleton.ConnectedClients.Count];
             m_isAuctionStateFirstTrigger = false;
 

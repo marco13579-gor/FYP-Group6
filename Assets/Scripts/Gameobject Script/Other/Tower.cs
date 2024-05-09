@@ -67,14 +67,14 @@ public abstract class Tower : NetworkBehaviour
         //Upgrade Effect logic
         if (m_effectEnableTimer >= Time.time)
         {
-            if (m_towerUpgradeEffect.activeSelf == false)
+            if (m_towerUpgradeEffect && m_towerUpgradeEffect.activeSelf == false)
             {
                 m_towerUpgradeEffect.SetActive(true);
             }
         }
         else
         {
-            if (m_towerUpgradeEffect.activeSelf == true)
+            if (m_towerUpgradeEffect && m_towerUpgradeEffect.activeSelf == true)
             {
                 m_towerUpgradeEffect.SetActive(false);
             }

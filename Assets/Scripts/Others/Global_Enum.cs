@@ -32,7 +32,8 @@ public enum TowerType
     Obelisk,
     AncientRelics,
     Chronos,
-    TheDespair
+    TheDespair,
+    AbsoluteZero
 }
 
 public enum GameState 

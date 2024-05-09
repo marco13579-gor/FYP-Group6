@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 0.14
-  stunDuration: 3
+  stunDuration: 1
 --- !u!114 &4741064140892642032
 MonoBehaviour:
   m_ObjectHideFlags: 0

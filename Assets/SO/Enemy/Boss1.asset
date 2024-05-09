@@ -12,13 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 481acf68c11df7146b9ac65ea02deee7, type: 3}
   m_Name: Boss1
   m_EditorClassIdentifier: 
-  m_name: Testing Enemy
+  m_name: Despair Dark Warrior
   m_maxHealth: 3000
   m_health: 3000
   m_attackPower: 30
-  m_movementSpeed: 1
+  m_movementSpeed: 1.4
   m_rewardGold: 100
   m_isSlowResistance: 0
   m_isStunResistance: 0
   m_isFireResistance: 0
   m_isExecuteResistance: 1
+  m_description: He is getting another level upgrade by the mysterious power. He
+    cannot be executed by a light protection.

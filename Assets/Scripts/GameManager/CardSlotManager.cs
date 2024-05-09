@@ -38,7 +38,7 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
         if (PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) >= requiredGold)
         {
             int newGoldAmount = PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - requiredGold;
-            //GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
+            GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
 
             RefreshCardSlot(0);
             RefreshCardSlot(1);
@@ -143,11 +143,11 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
             turnValue = 1;
         }
         CardDrawState cardDrawState;
-        if (turnValue <= 5)
+        if (turnValue <= 10)
         {
             cardDrawState = CardDrawState.EarlyGame;
         }
-        else if (turnValue <= 15)
+        else if (turnValue <= 20)
         {
             cardDrawState = CardDrawState.MidGame;
         }
@@ -163,10 +163,10 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
                 drawValue = 20;
                 break;
             case CardDrawState.MidGame:
-                drawValue = 50; 
+                drawValue = 60; 
                 break;
             case CardDrawState.LateGame:
-                drawValue = 100;
+                drawValue = 120;
                 break;
         }
 

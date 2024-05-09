@@ -70,7 +70,6 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     [ClientRpc]
     private void UpdatePlayerHealthModifyClientRpc(int newHealthAmount, int modifierID)
     {
-        if (m_isLosed) { return; }
         if (m_playersHealthList[modifierID] > 0)
             m_playersHealthList[modifierID] = newHealthAmount;
 
@@ -79,13 +78,10 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
             if (m_playersHealthList[modifierID] <= 0)
             {
                 m_isLosed = true;
-                UIElementReference.Instance.m_loseGamePanel.SetActive(true);
-                UIElementReference.Instance.m_restartButton.GetComponent<Button>().onClick.AddListener(delegate
+                if(m_playerLosedAmount < GameNetworkManager.Instance.GetPlayerNumber() - 1)
                 {
-                    UIElementReference.Instance.m_loseGamePanel.SetActive(false);
-                });
-
-                UpdataServerPlayerLosedAmountServerRpc();
+                    UpdataServerPlayerLosedAmountServerRpc();
+                }
             }
         }
     }
@@ -101,10 +97,18 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
             {
                 if (m_playersHealthList[i] > 0)
                 {
-                    int winPlayerIndex = 0;
+                    int winPlayerIndex = i;
                     EndGameTriggerClientRpc(winPlayerIndex);
                 }
             }
+        }
+        else
+        {
+            UIElementReference.Instance.m_loseGamePanel.SetActive(true);
+            UIElementReference.Instance.m_restartButton.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                UIElementReference.Instance.m_loseGamePanel.SetActive(false);
+            });
         }
     }
 

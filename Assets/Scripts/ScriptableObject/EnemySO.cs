@@ -17,4 +17,5 @@ public class EnemySO : ScriptableObject
     public bool m_isStunResistance;
     public bool m_isFireResistance;
     public bool m_isExecuteResistance;
+    public string m_description;
 }

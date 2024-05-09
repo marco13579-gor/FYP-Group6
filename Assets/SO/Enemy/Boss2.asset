@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 481acf68c11df7146b9ac65ea02deee7, type: 3}
   m_Name: Boss2
   m_EditorClassIdentifier: 
-  m_name: Testing Enemy
+  m_name: Final Demon Dragon
   m_maxHealth: 15000
   m_health: 15000
   m_attackPower: 50
-  m_movementSpeed: 1
+  m_movementSpeed: 0.8
   m_rewardGold: 300
   m_isSlowResistance: 0
   m_isStunResistance: 0
   m_isFireResistance: 0
   m_isExecuteResistance: 1
+  m_description: The ultimate  weapon that demon can use. It is having  execute resistance.

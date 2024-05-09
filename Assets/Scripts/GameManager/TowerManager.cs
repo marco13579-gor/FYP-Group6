@@ -80,6 +80,11 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
     private void UpgradeTowerLogic()
     {
+        if (PlayerStatsManager.Instance.GetLoseStatus())
+        {
+            return;
+        }
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out RaycastHit hit, 100000f, LayerMask.GetMask("Tower")) && Input.GetKeyDown(KeyCode.Mouse0) && BuildingManager.Instance.GetPrebuildTower() == null && m_selectedTower == null)
@@ -131,11 +136,14 @@ public class TowerManager : NetworkedSingleton<TowerManager>
             UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
             UIElementReference.Instance.m_desriptionText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().m_towerSO.m_desritption.ToString();
 
+            WarningManager.Instance.ModifyCardSlotWarningText($"You select a tower info! Before selecting another tower, right click to deselect the tower!");
+
             UIElementReference.Instance.m_towerUpgradeTowerAttackPowerButton.GetComponent<Button>().onClick.AddListener(delegate
             {
                 if (PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
                 {
                     GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
+                    WarningManager.Instance.ModifyCardSlotWarningText($"You do not have enough money to upgrade the tower. It require ${target.GetComponent<Tower>().GetUpgradeRequiredGold()} and you only have ${PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()]}");
                     return;
                 }
 
@@ -159,10 +167,13 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 if (PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
                 {
                     GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
+                    WarningManager.Instance.ModifyCardSlotWarningText($"You do not have enough money to upgrade the tower. It require ${target.GetComponent<Tower>().GetUpgradeRequiredGold()} and you only have ${PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()]}");
                     return;
                 }
 
                 UpgradeTower(target.GetComponent<Tower>().GetTowerID(), UpgradeCore.AttackSpeed);
+
+                target.GetComponent<Tower>().EnableUpgradeEffect();
 
                 UIElementReference.Instance.m_attacSpeedText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackSpeed().ToString();
 
@@ -178,10 +189,13 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 if (PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()] < target.GetComponent<Tower>().GetUpgradeRequiredGold())
                 {
                     GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
+                    WarningManager.Instance.ModifyCardSlotWarningText($"You do not have enough money to upgrade the tower. It require ${target.GetComponent<Tower>().GetUpgradeRequiredGold()} and you only have ${PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()]}");
                     return;
                 }
 
                 UpgradeTower(target.GetComponent<Tower>().GetTowerID(), UpgradeCore.AttackRange);
+
+                target.GetComponent<Tower>().EnableUpgradeEffect();
 
                 UIElementReference.Instance.m_attackRangeText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackRange().ToString();
 
@@ -197,6 +211,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.FirstTarget);
                 GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
                 UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+                WarningManager.Instance.ModifyCardSlotWarningText($"You just change your tower to ${target.GetComponent<TowerTargeting>().TargetConditionToString()} mode");
             });
 
             UIElementReference.Instance.m_towerTargetConditionLastTargetButton.GetComponent<Button>().onClick.AddListener(delegate
@@ -204,6 +219,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.LastTarget);
                 GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
                 UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+                WarningManager.Instance.ModifyCardSlotWarningText($"You just change your tower to ${target.GetComponent<TowerTargeting>().TargetConditionToString()} mode");
             });
 
             UIElementReference.Instance.m_towerTargetConditionMaxHealthButton.GetComponent<Button>().onClick.AddListener(delegate
@@ -211,6 +227,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MaxHealth);
                 GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
                 UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+                WarningManager.Instance.ModifyCardSlotWarningText($"You just change your tower to ${target.GetComponent<TowerTargeting>().TargetConditionToString()} mode");
             });
 
             UIElementReference.Instance.m_towerTargetConditionMinHealthButton.GetComponent<Button>().onClick.AddListener(delegate
@@ -218,6 +235,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MinHealth);
                 GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
                 UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+                WarningManager.Instance.ModifyCardSlotWarningText($"You just change your tower to ${target.GetComponent<TowerTargeting>().TargetConditionToString()} mode");
             });
 
             UIElementReference.Instance.m_towerTargetConditionMaxSpeedButton.GetComponent<Button>().onClick.AddListener(delegate
@@ -225,6 +243,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MaxSpeed);
                 GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
                 UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+                WarningManager.Instance.ModifyCardSlotWarningText($"You just change your tower to ${target.GetComponent<TowerTargeting>().TargetConditionToString()} mode");
             });
 
             UIElementReference.Instance.m_towerTargetConditionMinSpeedButton.GetComponent<Button>().onClick.AddListener(delegate
@@ -232,6 +251,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 target.GetComponent<TowerTargeting>().SetTowerTargetCondition(TowerTargetsSelectCondition.MinSpeed);
                 GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_towerTargetSelectChangeSound);
                 UIElementReference.Instance.m_currentAtkMode.GetComponent<TMP_Text>().text = target.GetComponent<TowerTargeting>().TargetConditionToString();
+                WarningManager.Instance.ModifyCardSlotWarningText($"You just change your tower to ${target.GetComponent<TowerTargeting>().TargetConditionToString()} mode");
             });
 
             UIElementReference.Instance.m_removeTowerButton.GetComponent<Button>().onClick.AddListener(delegate
@@ -248,6 +268,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
                 UIElementReference.Instance.m_towerTargetConditionMaxSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
                 UIElementReference.Instance.m_towerTargetConditionMinSpeedButton.GetComponent<Button>().onClick.RemoveAllListeners();
 
+                WarningManager.Instance.ModifyCardSlotWarningText($"You just remove the tower. Remember no refund will be made!");
                 UIElementReference.Instance.m_towerUpgradePanel.SetActive(false);
             });
         }

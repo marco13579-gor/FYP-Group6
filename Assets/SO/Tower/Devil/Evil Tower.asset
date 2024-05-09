@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_name: Evil Tower
   m_towerType: 14
-  m_attackPower: 100
-  m_attackSpeed: 1.2
+  m_attackPower: 15
+  m_attackSpeed: 0.8
   m_attackRange: 7
-  m_isAreaAttack: 1
-  m_cost: 10
+  m_isAreaAttack: 0
+  m_cost: 15
   m_tileToBuild: 
   m_offset: {x: 0.25, y: 0, z: 0.25}
   m_sprite: {fileID: 21300000, guid: f3f15992fb01da24c822a422e91d90ee, type: 3}

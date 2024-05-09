@@ -22,4 +22,5 @@ MonoBehaviour:
   m_tileToBuild: 
   m_offset: {x: 0.25, y: 0, z: 0.25}
   m_sprite: {fileID: 21300000, guid: da70ecb9b64defc43b01192e95782ddd, type: 3}
-  m_desritption: No Effect
+  m_desritption: The King of time. It will slow the enemy 10s  and rupture the enemy
+    with 80%

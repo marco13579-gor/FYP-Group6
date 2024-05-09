@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Xml.Linq;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class Enemy : NetworkBehaviour
@@ -30,6 +31,9 @@ public class Enemy : NetworkBehaviour
     private GameObject m_fireResistance;
     [SerializeField]
     private GameObject m_executeResistance;
+    [SerializeField]
+    private GameObject m_cameraPoint;
+
 
     private Transform[] m_wayPointList;
     private Transform m_movingTarget;
@@ -68,7 +72,6 @@ public class Enemy : NetworkBehaviour
     private float m_isRupturedRate = 0;
     private void Awake()
     {
-        m_Collider.enabled = false;
     }
 
     public override void OnNetworkSpawn()
@@ -131,12 +134,18 @@ public class Enemy : NetworkBehaviour
     {
         if (m_isIgnited)
         {
-            m_ignitedEffect.SetActive(true);
+            ToggleIgnitedEffectClientRpc(true);
         }
         else
         {
-            m_ignitedEffect.SetActive(false);
+            ToggleIgnitedEffectClientRpc(false);
         }
+    }
+
+    [ClientRpc]
+    private void ToggleIgnitedEffectClientRpc(bool option)
+    {
+        m_ignitedEffect.SetActive(option);
     }
 
     private void EnemyMove()
@@ -170,6 +179,7 @@ public class Enemy : NetworkBehaviour
             int newHealthAmount = PlayerStatsManager.Instance.GetPlayerHealth(this.GetPlayMap()) - (int)this.m_attackPower.Value;
             GameEventReference.Instance.OnPlayerModifyHealth.Trigger(newHealthAmount, this.GetPlayMap());
 
+            EnemySelectManager.Instance.TriggerEnemyDeath(this.gameObject);
             EnemyManager.Instance.Unregister(this.gameObject);
             GetComponent<NetworkObject>().Despawn();
             return;
@@ -201,8 +211,9 @@ public class Enemy : NetworkBehaviour
                 EnemyManager.Instance.Unregister(this.gameObject);
                 isDie = true;
                 this.m_movementSpeed.Value = 0;
-                GetComponent<Animator>().SetTrigger("die");
+                GetComponent<NetworkAnimator>().SetTrigger("die");
                 GetComponent<DissolveController>().TriggerDie();
+                EnemySelectManager.Instance.TriggerEnemyDeath(this.gameObject);
                 EnemyDieSoundTriggerClientRpc();
             }
         }
@@ -398,4 +409,6 @@ public class Enemy : NetworkBehaviour
     public void RemoveIgnitedDictionaryKey(int ID) => m_ignitedList.Remove(ID);
     public bool GetExecuteResistance() => m_isExecuteResistance.Value;
     public bool GetFireResistance() => m_isFireResistance.Value;
+    public EnemySO GetEnemySo() => m_enemySO;
+    public Vector3 GetCameraPoint() => m_cameraPoint.transform.position;
 }

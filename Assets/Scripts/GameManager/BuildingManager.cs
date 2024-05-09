@@ -39,7 +39,6 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
                 && currentTile.GetComponent<Node>().GetPossibleBuilderID() == GameNetworkManager.Instance.GetPlayerID()
                 && m_prebuildTower.m_towerSO.m_tileToBuild.Length >= 0)
             {
-                //check pointing tile
                 bool canBuildTower = true;
 
                 //checking extra tiles
@@ -76,9 +75,11 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
                     GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_buildSound);
                     GameEventReference.Instance.OnPlayerConsumeCard.Trigger(m_cardSlotToConsume);
                     BuildingRequestServerRpc(m_prebuildTower.GetTower().m_towerSO.m_towerType, raycastHit.transform.GetComponent<Tiles>(), m_prebuildTower.transform.position);
+                    WarningManager.Instance.ModifyCardSlotWarningText("");
                 }
                 else if(Input.GetMouseButtonDown(0) && !canBuildTower)
                 {
+                    WarningManager.Instance.ModifyCardSlotWarningText("Tiles are occupy by other towers. Please select another tiles to build.");
                     GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
                 }
             }
@@ -96,6 +97,8 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
                 int newGoldAmount = PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) + m_prebuildTower.GetTower().m_towerSO.m_cost;
 
                 GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
+
+                WarningManager.Instance.ModifyCardSlotWarningText($"");
 
                 Destroy(m_prebuildTower.gameObject);
                 m_prebuildTower = null;
@@ -232,6 +235,12 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
             case TowerType.Chronos:
                 tower = TowerPrefabsReference.Instance.m_chronos.GetComponent<Tower>();
                 break;
+            case TowerType.TheDespair:
+                tower = TowerPrefabsReference.Instance.m_theDespair.GetComponent<Tower>();
+                break;
+            case TowerType.AbsoluteZero:
+                tower = TowerPrefabsReference.Instance.m_absoluteZero.GetComponent<Tower>();
+                break;
             default:
                 tower = null;
                 break;
@@ -246,9 +255,15 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
 
     public void SelectTower(PrebuildTower tower)
     {
+        if (PlayerStatsManager.Instance.GetLoseStatus())
+        {
+            WarningManager.Instance.ModifyCardSlotWarningText("You cannot build when you lose the game!");
+            return;
+        }
+
         if (m_prebuildTower != null)
         {
-            Debug.Log("Waiting to build a tower!");
+            WarningManager.Instance.ModifyCardSlotWarningText("Please place the tower before selecting other tower, right click to deselect.");
         }
         else if (PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) >= tower.m_towerSO.m_cost)
         {
@@ -259,12 +274,14 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
 
             GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
             m_prebuildTower = Instantiate(tower);
+            WarningManager.Instance.ModifyCardSlotWarningText("You are entered building mode. Left click to build or right click to deselect.");
             //m_towerToBuild.GetComponent<Renderer>().material.color = new Color(1f, 1f, 1f, .5f);
         }
         else
         {
             Debug.Log("Cost is too high!!");
             GameObjectReference.Instance.m_audioSource.PlayOneShot(AudioClipReference.Instance.m_wrongSound);
+            WarningManager.Instance.ModifyCardSlotWarningText($"The tower require ${tower.m_towerSO.m_cost} and you only own ${PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID())}");
         }
     }
     public float RoundToNearestGrid(float pos)

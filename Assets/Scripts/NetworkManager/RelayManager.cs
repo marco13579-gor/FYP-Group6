@@ -32,6 +32,11 @@ public class RelayManager : NetworkBehaviour
     [SerializeField]
     private TMP_Text m_NotEnoughPlayerText;
 
+    [SerializeField]
+    private GameObject m_tutPanel;
+    [SerializeField]
+    private GameObject m_relayPanel;
+
     private string m_RoomCode;
 
     private IEnumerator Start()
@@ -66,11 +71,11 @@ public class RelayManager : NetworkBehaviour
         if (networkManager == null || (!networkManager.IsServer && !networkManager.IsHost))
             return;
 
-        if (networkManager.ConnectedClientsList.Count < 2)
-        {
-            m_NotEnoughPlayerText.gameObject.SetActive(true);
-            return;
-        }
+        //if (networkManager.ConnectedClientsList.Count < 2)
+        //{
+        //    m_NotEnoughPlayerText.gameObject.SetActive(true);
+        //    return;
+        //}
 
         GameStateManager.Instance.ToggleReadyButtonClick();
         StartGameClientRpc();
@@ -147,6 +152,7 @@ public class RelayManager : NetworkBehaviour
         }
 
         var listenAddress = addresses[0];
+        m_RoomCode = listenAddress.ToString();
         transport.SetConnectionData("127.0.0.1", 7777, listenAddress);
 
         m_RoomCodeText.text = listenAddress;
@@ -234,5 +240,11 @@ public class RelayManager : NetworkBehaviour
             }
         }
         return addresses;
+    }
+
+    public void OnClickHowToPlayButton()
+    {
+        m_relayPanel.SetActive(false);
+        m_tutPanel.SetActive(true);
     }
 }

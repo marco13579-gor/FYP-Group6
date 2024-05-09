@@ -12,13 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 481acf68c11df7146b9ac65ea02deee7, type: 3}
   m_Name: Mob1
   m_EditorClassIdentifier: 
-  m_name: Testing Enemy
+  m_name: Purple Mist
   m_maxHealth: 10
   m_health: 10
-  m_attackPower: 40
+  m_attackPower: 1
   m_movementSpeed: 2
   m_rewardGold: 1
   m_isSlowResistance: 0
   m_isStunResistance: 0
   m_isFireResistance: 0
   m_isExecuteResistance: 0
+  m_description: 'A mist that generates  from poison. It is moving faster than a
+    skeleton but the attack power will be lower. '

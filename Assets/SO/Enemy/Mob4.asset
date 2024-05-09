@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 481acf68c11df7146b9ac65ea02deee7, type: 3}
   m_Name: Mob4
   m_EditorClassIdentifier: 
-  m_name: Testing Enemy
+  m_name: Treasure Bobby
   m_maxHealth: 130
   m_health: 130
   m_attackPower: 0
   m_movementSpeed: 6
-  m_rewardGold: 3
+  m_rewardGold: 10
   m_isSlowResistance: 0
   m_isStunResistance: 0
   m_isFireResistance: 0
   m_isExecuteResistance: 0
+  m_description: You want to get its reward? Catch him and take it!!!
