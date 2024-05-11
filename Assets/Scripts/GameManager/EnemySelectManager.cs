@@ -25,18 +25,15 @@ public class EnemySelectManager : Singleton<EnemySelectManager>
 
     void Update()
     {
-        print("Before SelectEnemyLogic");
         SelectEnemyLogic();
     }
 
     private void SelectEnemyLogic()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        print(" SelectEnemyLogic 1");
 
         if (Physics.Raycast(ray, out RaycastHit hit, 100000f, LayerMask.GetMask("Enemy")) && Input.GetKeyDown(KeyCode.Mouse0))
         {
-            print("SelectEnemyLogic 2");
             if (!hit.transform.gameObject.GetComponent<Enemy>().GetDieStatus())
             {
                 m_selectedEnemyObj = hit.transform.gameObject;
@@ -72,7 +69,7 @@ public class EnemySelectManager : Singleton<EnemySelectManager>
         if (m_selectedEnemyObj != null && !m_selectedEnemyObj.GetComponent<Enemy>().GetDieStatus())
         {
             m_targetCamera.transform.position = m_selectedEnemyObj.GetComponent<Enemy>().GetCameraPoint();
-            m_targetCamera.transform.LookAt(m_selectedEnemyObj.transform);
+            m_targetCamera.transform.LookAt(m_selectedEnemyObj.GetComponent<Enemy>().GetCameraFocusingPoint().transform.position);
         }
     }
 

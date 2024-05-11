@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Mob7
   m_EditorClassIdentifier: 
   m_name: Lizard Man
-  m_maxHealth: 420
-  m_health: 420
+  m_maxHealth: 460
+  m_health: 460
   m_attackPower: 5
   m_movementSpeed: 3.2
   m_rewardGold: 10

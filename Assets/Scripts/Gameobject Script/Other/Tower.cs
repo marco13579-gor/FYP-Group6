@@ -184,7 +184,7 @@ public abstract class Tower : NetworkBehaviour
 
     public int GetUpgradeRequiredGold() => m_upgradeRequiredGold;
 
-    public void UpgradeGoldIncrease() => m_upgradeRequiredGold = m_upgradeRequiredGold * 2;
+    public void UpgradeGoldIncrease() => m_upgradeRequiredGold = (int)(m_upgradeRequiredGold * 1.3f);
 
     public void TurnOnRangeIndiactor() => m_towerRangeIndiactor.SetActive(true);
 

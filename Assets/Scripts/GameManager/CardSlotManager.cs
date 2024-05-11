@@ -147,7 +147,7 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
         {
             cardDrawState = CardDrawState.EarlyGame;
         }
-        else if (turnValue <= 20)
+        else if (turnValue <= 15)
         {
             cardDrawState = CardDrawState.MidGame;
         }
@@ -160,13 +160,13 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
         switch (cardDrawState)
         {
             case CardDrawState.EarlyGame:
-                drawValue = 20;
+                drawValue = 60;
                 break;
             case CardDrawState.MidGame:
-                drawValue = 60; 
+                drawValue = 100; 
                 break;
             case CardDrawState.LateGame:
-                drawValue = 120;
+                drawValue = 999;
                 break;
         }
 

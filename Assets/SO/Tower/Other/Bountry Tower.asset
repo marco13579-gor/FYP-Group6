@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_name: Bountry Tower
   m_towerType: 19
-  m_attackPower: 0
+  m_attackPower: 10
   m_attackSpeed: 1
   m_attackRange: 4
   m_isAreaAttack: 0

@@ -153,7 +153,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
                 target.GetComponent<Tower>().EnableUpgradeEffect();
 
-                UIElementReference.Instance.m_attackPowerText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackPower().ToString();
+                UIElementReference.Instance.m_attackPowerText.GetComponent<TMP_Text>().text = ((target.GetComponent<Tower>().GetAttackPower())).ToString();
 
                 GameEventReference.Instance.OnPlayerModifyGold.Trigger(PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - target.GetComponent<Tower>().GetUpgradeRequiredGold(), GameNetworkManager.Instance.GetPlayerID());
 
@@ -175,7 +175,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
                 target.GetComponent<Tower>().EnableUpgradeEffect();
 
-                UIElementReference.Instance.m_attacSpeedText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackSpeed().ToString();
+                UIElementReference.Instance.m_attacSpeedText.GetComponent<TMP_Text>().text = (target.GetComponent<Tower>().GetAttackSpeed()).ToString();
 
                 GameEventReference.Instance.OnPlayerModifyGold.Trigger(PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - target.GetComponent<Tower>().GetUpgradeRequiredGold(), GameNetworkManager.Instance.GetPlayerID());
 
@@ -197,7 +197,7 @@ public class TowerManager : NetworkedSingleton<TowerManager>
 
                 target.GetComponent<Tower>().EnableUpgradeEffect();
 
-                UIElementReference.Instance.m_attackRangeText.GetComponent<TMP_Text>().text = target.GetComponent<Tower>().GetAttackRange().ToString();
+                UIElementReference.Instance.m_attackRangeText.GetComponent<TMP_Text>().text = (target.GetComponent<Tower>().GetAttackRange()).ToString();
 
                 GameEventReference.Instance.OnPlayerModifyGold.Trigger(PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - target.GetComponent<Tower>().GetUpgradeRequiredGold(), GameNetworkManager.Instance.GetPlayerID());
 

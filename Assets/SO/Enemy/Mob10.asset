@@ -18,7 +18,7 @@ MonoBehaviour:
   m_attackPower: 10
   m_movementSpeed: 4.2
   m_rewardGold: 20
-  m_isSlowResistance: 1
+  m_isSlowResistance: 0
   m_isStunResistance: 1
   m_isFireResistance: 0
   m_isExecuteResistance: 0

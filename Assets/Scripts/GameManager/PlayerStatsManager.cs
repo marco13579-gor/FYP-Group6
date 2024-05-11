@@ -44,7 +44,6 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     {
         if (GameNetworkManager.Instance.GetPlayerID() == id)
         {
-            print("Loseeeee");
         }
     }
 
@@ -163,13 +162,11 @@ public class PlayerStatsManager : NetworkedSingleton<PlayerStatsManager>
     [ServerRpc(RequireOwnership = false)]
     private void UpdatePlayerGoldModifyServerRpc(int newGoldAmount, int modifierID)
     {
-        print("UpdatePlayerGoldModifyServerRpc");
         UpdatePlayerGoldModifyClientRpc(newGoldAmount, modifierID);
     }
     [ClientRpc]
     private void UpdatePlayerGoldModifyClientRpc(int newGoldAmount, int modifierID)
     {
-        print($"Modify Target ID: {modifierID}");
         m_playersGoldList[modifierID] = newGoldAmount;
     }
 

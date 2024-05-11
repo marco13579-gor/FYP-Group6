@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Mob9
   m_EditorClassIdentifier: 
   m_name: Undead Fate
-  m_maxHealth: 1000
-  m_health: 1000
+  m_maxHealth: 880
+  m_health: 880
   m_attackPower: 10
   m_movementSpeed: 5
   m_rewardGold: 15
   m_isSlowResistance: 1
   m_isStunResistance: 0
-  m_isFireResistance: 1
+  m_isFireResistance: 0
   m_isExecuteResistance: 0
   m_description: The one who come from the "Undead World". It is Slow resistance
     and Fire resistance.

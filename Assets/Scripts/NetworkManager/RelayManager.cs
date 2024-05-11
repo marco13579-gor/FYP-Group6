@@ -73,11 +73,11 @@ public class RelayManager : NetworkBehaviour
         if (networkManager == null || (!networkManager.IsServer && !networkManager.IsHost))
             return;
 
-        if (networkManager.ConnectedClientsList.Count < 2)
-        {
-            m_NotEnoughPlayerText.gameObject.SetActive(true);
-            return;
-        }
+        //if (networkManager.ConnectedClientsList.Count < 2)
+        //{
+        //    m_NotEnoughPlayerText.gameObject.SetActive(true);
+        //    return;
+        //}
 
         GameStateManager.Instance.ToggleReadyButtonClick();
         StartGameClientRpc();

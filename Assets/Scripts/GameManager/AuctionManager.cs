@@ -143,19 +143,16 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
     {
         if (m_highestBid.Value == 0)
         {
-            print("input the bid amount");
             return;
         }
 
         if (m_highestBid.Value + m_minimumBidAmount > m_bidAmount)
         {
-            print($"bid amount must be highest + {m_minimumBidAmount}");
             return;
         }
 
         if(m_bidAmount > PlayerStatsManager.Instance.m_playersGoldList[GameNetworkManager.Instance.GetPlayerID()])
         {
-            print($"You don't have enough money!");
             return;
         }
 
@@ -189,7 +186,6 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
         {
             for (int i = 0; i < m_playerGiveUpList.Length; i++)
             {
-                print(m_playerGiveUpList[i]);
                 if (m_playerGiveUpList[i] == false)
                 { 
                     EndAuctionState(i);
@@ -220,7 +216,6 @@ public class AuctionManager : NetworkedSingleton<AuctionManager>
         }
         else
         {
-            print("You lost");
         }
     }
 

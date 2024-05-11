@@ -269,8 +269,6 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
         {
             int newGoldAmount = PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - tower.m_towerSO.m_cost;
 
-            print($"newGoldAmount: {newGoldAmount}");
-            print($"GameNetworkManager.Instance.GetPlayerID(): {GameNetworkManager.Instance.GetPlayerID()}");
 
             GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
             m_prebuildTower = Instantiate(tower);

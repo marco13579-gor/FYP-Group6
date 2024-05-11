@@ -34,7 +34,6 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
         {
             if (IsClient)
             {
-                print($"player ID = {GameNetworkManager.Instance.GetPlayerID()}");
                 switch (GameNetworkManager.Instance.GetPlayerID())
                 {
                     case 0:
@@ -109,15 +108,11 @@ public class GameStateManager : NetworkedSingleton<GameStateManager>
     private void OnEnterPrepartionState(params object[] param)
     {
         m_enterStateTime = Time.time + m_prepartionTime;
-        print("Time added");
-        print($"m_enterStateTime: {m_enterStateTime} Time: {Time.time}");
         m_enterBattleStateTrigger = false;
-        print("OnEnterPrepartionState");
     }
 
     private void OnEnterBattleState(params object[] param)
     {
-        print("OnEnterBattleState");
     }
 
     private void OnEnterReposeState(params object[] param)

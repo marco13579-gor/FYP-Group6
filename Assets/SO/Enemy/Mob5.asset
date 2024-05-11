@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Mob5
   m_EditorClassIdentifier: 
   m_name: Mr. Crab
-  m_maxHealth: 280
-  m_health: 280
+  m_maxHealth: 350
+  m_health: 350
   m_attackPower: 5
   m_movementSpeed: 2.4
   m_rewardGold: 5

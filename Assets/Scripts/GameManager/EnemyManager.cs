@@ -95,7 +95,6 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
         {
             if (m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().ContainsKey(TowerID))
             {
-                print("Ignite tower same");
             }
         }
 
@@ -103,7 +102,8 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
         {
             if (m_SpawnedEnemies[enemyID] != null)
             {
-                UpdataIgnitedDictionaryClientRpc(enemyID, TowerID, damage);
+                if(!m_SpawnedEnemies[enemyID].GetComponent<Enemy>().GetEnemyIgnitedDictionary().ContainsKey(TowerID))
+                    m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyIgnitedDictionary(TowerID, damage);
                 m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyIgnited(true);
                 StartCoroutine(IHurtEnemy(enemyID, damage, triggerCount, TowerID));
             }
@@ -113,7 +113,7 @@ public class EnemyManager : NetworkedSingleton<EnemyManager>
     [ClientRpc]
     private void UpdataIgnitedDictionaryClientRpc(int enemyID, int towerID, float damage)
     {
-        //m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyIgnitedDictionary(towerID, damage);
+        m_SpawnedEnemies[enemyID].GetComponent<Enemy>().SetEnemyIgnitedDictionary(towerID, damage);
     }
 
     private IEnumerator IHurtEnemy(int ID, float damage, int triggerTime, int towerID)

@@ -34,6 +34,9 @@ public class Enemy : NetworkBehaviour
     [SerializeField]
     private GameObject m_cameraPoint;
 
+    [SerializeField]
+    private GameObject m_cameraFocusingPoint;
+
 
     private Transform[] m_wayPointList;
     private Transform m_movingTarget;
@@ -281,11 +284,8 @@ public class Enemy : NetworkBehaviour
 
         if (m_slowTimer >= Time.time)
         {
-            print("Slowed");
-            print("m_slowedMovementSpeed.Value before" + m_slowedMovementSpeed.Value);
             float reducedMovementSpeed = m_enemySO.m_movementSpeed * m_slowScale;
             m_slowedMovementSpeed.Value = reducedMovementSpeed;
-            print("m_slowedMovementSpeed.Value after" + m_slowedMovementSpeed.Value);
             ToggleSlowedEffectClientRpc(true);
         }
         else
@@ -428,4 +428,5 @@ public class Enemy : NetworkBehaviour
     public bool GetFireResistance() => m_isFireResistance.Value;
     public EnemySO GetEnemySo() => m_enemySO;
     public Vector3 GetCameraPoint() => m_cameraPoint.transform.position;
+    public GameObject GetCameraFocusingPoint() => m_cameraFocusingPoint;
 }
