@@ -30,7 +30,7 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
 
     public void RequestToRefreshCardSlot()
     {
-        if (PlayerStatsManager.Instance.GetLoseStatus()) return;
+        if (PlayerStatsManager.Instance.GetLoseStatus() || BuildingManager.Instance.GetPrebuildTower()) return;
 
         int requiredGold = GameStateManager.Instance.GetGameTurn() * 5;
         if (requiredGold == 0) requiredGold = 5;
@@ -51,6 +51,16 @@ public class CardSlotManager : NetworkedSingleton<CardSlotManager>
     private void RefreshCardSlot(int slotIndex)
     {
         if (PlayerStatsManager.Instance.GetLoseStatus()) return;
+
+        if (BuildingManager.Instance.GetPrebuildTower())
+        {
+            int newGoldAmount = PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) + BuildingManager.Instance.GetPrebuildTower().m_towerSO.m_cost;
+            GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
+
+            PrebuildTower towerToRemove = BuildingManager.Instance.GetPrebuildTower();
+            BuildingManager.Instance.RemovePrebuildTower();
+            Destroy(towerToRemove.gameObject);
+        }
 
         m_cardSlots[slotIndex].SetActive(true);
         m_cardSlots[slotIndex].transform.GetChild(4).GetComponent<Button>().onClick.RemoveAllListeners();

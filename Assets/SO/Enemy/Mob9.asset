@@ -19,7 +19,7 @@ MonoBehaviour:
   m_movementSpeed: 5
   m_rewardGold: 15
   m_isSlowResistance: 1
-  m_isStunResistance: 0
+  m_isStunResistance: 1
   m_isFireResistance: 0
   m_isExecuteResistance: 0
   m_description: The one who come from the "Undead World". It is Slow resistance

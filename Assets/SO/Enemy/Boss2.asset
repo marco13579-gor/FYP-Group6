@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Boss2
   m_EditorClassIdentifier: 
   m_name: Final Demon Dragon
-  m_maxHealth: 100
-  m_health: 100
+  m_maxHealth: 15000
+  m_health: 15000
   m_attackPower: 50
   m_movementSpeed: 0.8
   m_rewardGold: 300

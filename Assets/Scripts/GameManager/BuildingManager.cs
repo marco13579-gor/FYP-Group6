@@ -269,7 +269,6 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
         {
             int newGoldAmount = PlayerStatsManager.Instance.GetPlayerGold(GameNetworkManager.Instance.GetPlayerID()) - tower.m_towerSO.m_cost;
 
-
             GameEventReference.Instance.OnPlayerModifyGold.Trigger(newGoldAmount, GameNetworkManager.Instance.GetPlayerID());
             m_prebuildTower = Instantiate(tower);
             WarningManager.Instance.ModifyCardSlotWarningText("You are entered building mode. Left click to build or right click to deselect.");
@@ -314,6 +313,7 @@ public class BuildingManager : NetworkedSingleton<BuildingManager>
 
     public void SetCardConsumeSlot(int cardSlotIndex) => m_cardSlotToConsume = cardSlotIndex;
     public PrebuildTower GetPrebuildTower() => m_prebuildTower;
+    public void RemovePrebuildTower() => m_prebuildTower = null;
 }
 
 [Serializable]

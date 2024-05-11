@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -35,6 +36,8 @@ public class TowerTargeting : NetworkBehaviour
 
         m_availableTargets.RemoveAll(currentObj => currentObj == null);
 
+        CheckEnemyRangeToRemoveLogic();
+
         if (m_availableTargets.Count == 0)
         {
             m_targetEnemy = null;
@@ -42,6 +45,10 @@ public class TowerTargeting : NetworkBehaviour
         }
         else
         {
+            if (m_tower.GetTargetEnemy() == null && m_availableTargets[0] != null)
+            {
+                GameEventReference.Instance.OnTowerChangeTarget.Trigger(m_tower.GetTowerID(), m_availableTargets[0].GetComponent<Enemy>());
+            }
 
             switch (m_towerTargetSelectCondition)
             {
@@ -170,7 +177,7 @@ public class TowerTargeting : NetworkBehaviour
                             minHealthPointEnemyIndex = i;
                         }
                     }
-                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null &&!m_availableTargets[minHealthPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
+                    if (m_targetEnemy == null && m_availableTargets != null && m_availableTargets[0] != null && !m_availableTargets[minHealthPointEnemyIndex].GetComponent<Enemy>().Equals(m_targetEnemy))
                     {
                         if (m_availableTargets[minHealthPointEnemyIndex] != null)
                         {
@@ -217,31 +224,51 @@ public class TowerTargeting : NetworkBehaviour
 
     private void OnEnterReposeState(params object[] param)
     {
-        
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        GameObject target = other.transform.gameObject;
+        //GameObject target = other.transform.gameObject;
 
-        if (target.tag == "Enemy" && !m_availableTargets.Contains(target))
-        {
-            m_availableTargets.Add(target);
-        }
+        //if (target.tag == "Enemy" && !m_availableTargets.Contains(target))
+        //{
+        //    m_availableTargets.Add(target);
+        //}
     }
 
     private void OnTriggerExit(Collider other)
     {
-        GameObject target = other.transform.gameObject;
+        //GameObject target = other.transform.gameObject;
 
-        if (target.tag == "Enemy" && m_availableTargets.Contains(target))
+        //if (target.tag == "Enemy" && m_availableTargets.Contains(target))
+        //{
+        //    m_availableTargets.Remove(target);
+
+        //    if (target == m_targetEnemy)
+        //    {
+        //        m_targetEnemy = null;
+        //        m_tower.RemoveTarget();
+        //    }
+        //}
+    }
+
+    private void CheckEnemyRangeToRemoveLogic()
+    {
+        foreach (GameObject target in EnemyManager.Instance.m_SpawnedEnemies.Values.ToList())
         {
-            m_availableTargets.Remove(target);
-
-            if (target == m_targetEnemy)
+            float distance = Vector3.Distance(target.transform.position, m_tower.transform.position);
+            if (distance > m_tower.GetAttackRange())
             {
-                m_targetEnemy = null;
-                m_tower.RemoveTarget();
+                if (m_availableTargets.Contains(target))
+                    m_availableTargets.Remove(target);
+            }
+            else
+            {
+                if (!m_availableTargets.Contains(target))
+                {
+                    m_availableTargets.Add(target);
+                }
             }
         }
     }

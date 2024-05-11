@@ -193,4 +193,5 @@ public abstract class Tower : NetworkBehaviour
     public List<GameObject> GetMeshRenderer() => m_meshRenderer;
 
     public void RemoveTarget() => m_targetEnemy = null;
+    public Enemy GetTargetEnemy() => m_targetEnemy;
 }

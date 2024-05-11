@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Mob1
   m_EditorClassIdentifier: 
   m_name: Purple Mist
-  m_maxHealth: 10
-  m_health: 10
+  m_maxHealth: 15
+  m_health: 15
   m_attackPower: 1
   m_movementSpeed: 1.5
   m_rewardGold: 1
